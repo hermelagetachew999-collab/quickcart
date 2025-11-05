@@ -10,21 +10,34 @@ import nodemailer from "nodemailer";
 
 const app = express();
 
-// CORS
+// === CORS SETUP ===
+// Allow local dev URLs + production frontend URL
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://quickcart-gamma-green.vercel.app"
+];
+
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
-  methods: ["GET", "POST"],
-  credentials: false
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
 }));
 
 app.use(express.json());
 
-// CONNECT TO MONGODB
+// === MONGODB CONNECTION ===
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log("MongoDB Error:", err));
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ MongoDB Error:", err));
 
-// USER MODEL
+// === USER MODEL ===
 const userSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true, required: true },
@@ -34,7 +47,7 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model("User", userSchema);
 
-// ORDER MODEL
+// === ORDER MODEL ===
 const orderSchema = new mongoose.Schema({
   userId: String,
   userEmail: String,
@@ -50,7 +63,7 @@ app.post("/api/contact", async (req, res) => {
   if (!name || !email || !message) return res.status(400).json({ error: "All fields required" });
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
   });
 
@@ -64,7 +77,7 @@ app.post("/api/contact", async (req, res) => {
         <p>Thank you for contacting <strong>QuickCart</strong>!</p>
         <p>We've received your message:</p>
         <p style="background: white; padding: 15px; border-left: 4px solid #1abc9c; margin: 15px 0;">
-          ${message.replace(/\n/g, '<br>')}
+          ${message.replace(/\n/g, "<br>")}
         </p>
         <p>We will reply to you soon.</p>
         <p>Best regards,<br><strong>QuickCart Team</strong></p>
@@ -146,11 +159,11 @@ app.post("/api/forgot-password", async (req, res) => {
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     user.resetCode = code;
-    user.resetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    user.resetExpires = Date.now() + 10 * 60 * 1000; // 10 min
     await user.save();
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: "gmail",
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
 
@@ -187,10 +200,10 @@ app.post("/api/reset-password", async (req, res) => {
   res.json({ success: true });
 });
 
-// === TEST EMAIL (Optional) ===
+// === TEST EMAIL ===
 app.get("/test-email", async (req, res) => {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
   });
 
@@ -209,9 +222,8 @@ app.get("/test-email", async (req, res) => {
   }
 });
 
-// START SERVER
-const PORT = 5000;
+// === START SERVER ===
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`Frontend: http://localhost:5173`);
 });
