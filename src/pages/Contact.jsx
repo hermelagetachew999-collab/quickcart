@@ -9,6 +9,7 @@ export default function Contact({ user }) {
     message: "",
   });
   const [status, setStatus] = useState("");
+const API_URL = "https://quickcart-bips.onrender.com/api";
 
   // === ADMIN REPLY STATES ===
   const [replyEmail, setReplyEmail] = useState("");
@@ -23,7 +24,7 @@ export default function Contact({ user }) {
     setStatus("Sending...");
 
     try {
-      const res = await fetch("http://localhost:5000/api/contact", {
+      const res = await fetch(`${API_URL}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -48,7 +49,7 @@ export default function Contact({ user }) {
     setReplyStatus("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/reply", {
+      const res = await fetch(`${API_URL}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -65,7 +66,7 @@ export default function Contact({ user }) {
         setReplyStatus("Failed to send reply.");
       }
     } catch (err) {
-      setReplyStatus("Network error. Is backend running?");
+      setReplyStatus("Network error.");
     } finally {
       setReplyLoading(false);
     }

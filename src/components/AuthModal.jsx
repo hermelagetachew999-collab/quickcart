@@ -15,7 +15,9 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [sentCode, setSentCode] = useState(false);
   const [codeError, setCodeError] = useState("");
 
-  const API_URL = "http://localhost:5000/api";
+  // src/components/AuthModal.jsx
+const API_URL = "https://quickcart-bips.onrender.com/api"; 
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
