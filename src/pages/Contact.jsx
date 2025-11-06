@@ -9,7 +9,7 @@ export default function Contact({ user }) {
     message: "",
   });
   const [status, setStatus] = useState("");
-const API_URL = "https://quickcart-bips.onrender.com/api";
+const API_URL = "https://quickcart-3vqg.vercel.app";
 
   // === ADMIN REPLY STATES ===
   const [replyEmail, setReplyEmail] = useState("");

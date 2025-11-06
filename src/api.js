@@ -1,5 +1,5 @@
 // src/api.js
-const API = "https://quickcart-bips.onrender.com"; // your Render backend URL
+const API = "https://quickcart-3vqg.vercel.app"; 
 
 const getToken = () => localStorage.getItem("token");
 
