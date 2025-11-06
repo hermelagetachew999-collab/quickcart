@@ -224,6 +224,15 @@ app.get("/test-email", async (req, res) => {
 
 // === START SERVER ===
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+
+// Only start listening locally (not on Vercel)
+if (process.env.VERCEL) {
+  console.log("Running on Vercel serverless environment");
+} else {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
+
