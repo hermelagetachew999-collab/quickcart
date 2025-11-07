@@ -1,287 +1,165 @@
-import dotenv from "dotenv";
-dotenv.config({ path: "./.env" });
+// ~/quickcart/server/index.js
+import express from 'express';
+import serverless from 'serverless-http';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
+// ---------- Load .env ----------
+dotenv.config();
 
+// ---------- Express ----------
 const app = express();
-
-// === PRODUCTION CORS CONFIGURATION ===
-const allowedOrigins = [
-  "https://quickcart-gamma-green.vercel.app",
-  "https://quickcart-3vqg.vercel.app",
-  "http://localhost:5173"
-];
-
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
-}));
-
-// Handle preflight requests
-// Handle preflight requests for ALL routes
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', allowedOrigins);
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.status(200).send();
-});
-
+app.use(cors());
 app.use(express.json());
 
-// === MONGODB CONNECTION ===
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.log("❌ MongoDB Error:", err));
+// ---------- MongoDB ----------
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('MongoDB error:', err));
 
-// === USER MODEL ===
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true, required: true },
-  password: { type: String, required: true },
-  resetCode: String,
-  resetExpires: Number,
-});
-const User = mongoose.model("User", userSchema);
+// ---------- Models ----------
+import User from './models/User.js';
+import Product from './models/Product.js';
+import Cart from './models/Cart.js';
 
-// === ORDER MODEL ===
-const orderSchema = new mongoose.Schema({
-  userId: String,
-  userEmail: String,
-  items: Array,
-  total: Number,
-  createdAt: { type: Date, default: Date.now },
-});
-const Order = mongoose.model("Order", orderSchema);
-
-// === CONTACT ROUTE ===
-app.post("/api/contact", async (req, res) => {
-  const { name, email, message } = req.body;
-  if (!name || !email || !message) return res.status(400).json({ error: "All fields required" });
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-  });
-
-  const mailOptions = {
-    from: `"QuickCart Support" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "Thank you for contacting QuickCart!",
-    html: `
-      <div style="font-family: Arial, sans-serif; padding: 20px; background: #f4f9f4; border-radius: 10px;">
-        <h3 style="color: #1abc9c;">Hi ${name},</h3>
-        <p>Thank you for contacting <strong>QuickCart</strong>!</p>
-        <p>We've received your message:</p>
-        <p style="background: white; padding: 15px; border-left: 4px solid #1abc9c; margin: 15px 0;">
-          ${message.replace(/\n/g, "<br>")}
-        </p>
-        <p>We will reply to you soon.</p>
-        <p>Best regards,<br><strong>QuickCart Team</strong></p>
-      </div>
-    `,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to send" });
-  }
+// ---------- Nodemailer ----------
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
-// === ADD REPLY ENDPOINT ===
-app.post("/api/reply", async (req, res) => {
-  const { customerEmail, customerName, replyMessage } = req.body;
-  
-  if (!customerEmail || !replyMessage) {
-    return res.status(400).json({ error: "Customer email and reply message required" });
-  }
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-  });
-
-  const mailOptions = {
-    from: `"QuickCart Support" <${process.env.EMAIL_USER}>`,
-    to: customerEmail,
-    subject: "Re: Your QuickCart Inquiry",
-    html: `
-      <div style="font-family: Arial, sans-serif; padding: 20px; background: #f4f9f4; border-radius: 10px;">
-        <h3 style="color: #1abc9c;">Hi ${customerName || 'there'},</h3>
-        <p>Thank you for contacting QuickCart. Here's our response:</p>
-        <p style="background: white; padding: 15px; border-left: 4px solid #1abc9c; margin: 15px 0;">
-          ${replyMessage.replace(/\n/g, "<br>")}
-        </p>
-        <p>If you have any further questions, feel free to reply to this email.</p>
-        <p>Best regards,<br><strong>QuickCart Team</strong></p>
-      </div>
-    `,
-  };
-
-  try {
-    await transporter.sendMail(mailOptions);
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: "Failed to send reply" });
-  }
+// ---------- TEST ROUTE ----------
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Hello from QuickCart API!' });
 });
 
-// === SIGNUP ===
-app.post("/api/signup", async (req, res) => {
+// ---------- AUTH ROUTES ----------
+app.post('/api/register', async (req, res) => {
   const { name, email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: "Email and password required" });
-
   try {
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(400).json({ msg: 'User already exists' });
+
     const hashed = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hashed });
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    res.json({ token, user: { name, email } });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    res.json({ token, user: { id: user._id, name, email } });
   } catch (err) {
-    res.status(400).json({ error: "Email already exists" });
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// === LOGIN ===
-app.post("/api/login", async (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user || !await bcrypt.compare(password, user.password)) {
-    return res.status(401).json({ error: "Invalid email or password" });
-  }
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-  res.json({ token, user: { name: user.name, email } });
-});
-
-// === PLACE ORDER ===
-app.post("/api/orders", async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "No token" });
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
-    const { items, total } = req.body;
-    const order = await Order.create({
-      userId: user._id,
-      userEmail: user.email,
-      items,
-      total,
-    });
-    res.json({ success: true, order });
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(400).json({ msg: 'Invalid credentials' });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    res.json({ token, user: { id: user._id, name: user.name, email } });
   } catch (err) {
-    res.status(401).json({ error: "Invalid token" });
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// === FORGOT PASSWORD ===
-app.post("/api/forgot-password", async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ error: "Email required" });
-
-  let normalizedEmail = email.toLowerCase().trim();
-
-  // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(normalizedEmail)) {
-    return res.status(400).json({ error: "Invalid email format" });
-  }
-
+// ---------- PRODUCT ROUTES ----------
+app.get('/api/products', async (req, res) => {
   try {
-    const user = await User.findOne({ email: { $regex: `^${normalizedEmail}$`, $options: 'i' } });
-    if (!user) return res.status(404).json({ error: "Email not found" });
-
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    user.resetCode = code;
-    user.resetExpires = Date.now() + 10 * 60 * 1000; // 10 min
-    await user.save();
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-    });
-
-    const mailOptions = {
-      from: `"QuickCart Support" <${process.env.EMAIL_USER}>`,
-      to: normalizedEmail,
-      subject: "QuickCart Password Reset Code",
-      text: `Your code: ${code} (expires in 10 minutes)`,
-      html: `<p>Your code: <strong>${code}</strong> (expires in 10 minutes)</p>`,
-    };
-
-    await transporter.sendMail(mailOptions);
-    res.json({ success: true });
+    const products = await Product.find();
+    res.json(products);
   } catch (err) {
-    res.status(500).json({ error: "Failed to send code" });
+    res.status(500).json({ msg: 'Server error' });
   }
 });
 
-// === RESET PASSWORD ===
-app.post("/api/reset-password", async (req, res) => {
-  const { email, code, newPassword } = req.body;
-  if (!email || !code || !newPassword) return res.status(400).json({ error: "All fields required" });
-
-  const user = await User.findOne({ email });
-  if (!user || user.resetCode !== code || user.resetExpires < Date.now()) {
-    return res.status(400).json({ error: "Invalid or expired code" });
+app.post('/api/products', async (req, res) => {
+  try {
+    const product = await Product.create(req.body);
+    res.status(201).json(product);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
   }
-
-  user.password = await bcrypt.hash(newPassword, 10);
-  user.resetCode = undefined;
-  user.resetExpires = undefined;
-  await user.save();
-
-  res.json({ success: true });
 });
 
-// === TEST EMAIL ===
-app.get("/test-email", async (req, res) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-  });
+// ---------- CART ROUTES ----------
+app.get('/api/cart/:userId', async (req, res) => {
+  try {
+    let cart = await Cart.findOne({ userId: req.params.userId }).populate('items.productId');
+    if (!cart) {
+      cart = await Cart.create({ userId: req.params.userId, items: [] });
+    }
+    res.json(cart);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
 
+app.post('/api/cart/add', async (req, res) => {
+  const { userId, productId, quantity } = req.body;
+  try {
+    let cart = await Cart.findOne({ userId });
+    if (!cart) {
+      cart = new Cart({ userId, items: [] });
+    }
+
+    const existing = cart.items.find((i) => i.productId.toString() === productId);
+    if (existing) {
+      existing.quantity += quantity;
+    } else {
+      cart.items.push({ productId, quantity });
+    }
+
+    await cart.save();
+    await cart.populate('items.productId');
+    res.json(cart);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+app.post('/api/cart/remove', async (req, res) => {
+  const { userId, productId } = req.body;
+  try {
+    const cart = await Cart.findOne({ userId });
+    if (!cart) return res.status(404).json({ msg: 'Cart not found' });
+
+    cart.items = cart.items.filter((i) => i.productId.toString() !== productId);
+    await cart.save();
+    await cart.populate('items.productId');
+    res.json(cart);
+  } catch (err) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+});
+
+// ---------- EMAIL ROUTE (example) ----------
+app.post('/api/contact', async (req, res) => {
+  const { name, email, message } = req.body;
   const mailOptions = {
-    from: `"QuickCart Test" <${process.env.EMAIL_USER}>`,
+    from: email,
     to: process.env.EMAIL_USER,
-    subject: "TEST EMAIL - WORKING!",
-    text: "If you see this, email is 100% working!",
+    subject: `Contact from ${name}`,
+    text: message,
   };
-
   try {
     await transporter.sendMail(mailOptions);
-    res.json({ success: true, message: "Test email sent!" });
+    res.json({ msg: 'Email sent' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ msg: 'Email error' });
   }
 });
 
-// === START SERVER ===
-const PORT = process.env.PORT || 5000;
-
-// Add a root route to test if server is working
-app.get("/", (req, res) => {
-  res.json({ 
-    success: true, 
-    message: "QuickCart API is running!",
-    timestamp: new Date().toISOString(),
-    version: "1.0.0"
-  });
-});
-
-// For Vercel serverless - export the app directly
-export default app;
-
-// Only start listening locally, not on Vercel
-if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-} 
+// ---------- EXPORT FOR VERCEL ----------
+export const handler = serverless(app);
