@@ -15,8 +15,8 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [sentCode, setSentCode] = useState(false);
   const [codeError, setCodeError] = useState("");
 
-  // Use environment variable instead of hardcoded URL
-  const API_URL = import.meta.env.VITE_API_URL || "https://quickcart-3vqg.vercel.app";
+  // USE PRODUCTION URL
+  const API_URL = "https://quickcart-55wwwtf1v-hermela-getachews-projects-6c383e2f.vercel.app";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +24,7 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? "/api/login" : "/api/signup"; // Fixed: added /api
+      const endpoint = isLogin ? "/api/login" : "/api/signup"; // ✅ Fixed endpoints
       const body = isLogin ? { email, password } : { name, email, password };
 
       const res = await fetch(`${API_URL}${endpoint}`, {
@@ -62,7 +62,7 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/forgot-password`, { // Fixed: added /api
+      const res = await fetch(`${API_URL}/api/forgot-password`, { // ✅ Fixed endpoint
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -89,7 +89,7 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/reset-password`, { // Fixed: added /api
+      const res = await fetch(`${API_URL}/api/reset-password`, { // ✅ Fixed endpoint
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code: verifyCode, newPassword }),
@@ -114,6 +114,7 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
     }
   };
 
+  // ... rest of your JSX code remains exactly the same
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>

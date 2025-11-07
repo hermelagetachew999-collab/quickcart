@@ -10,8 +10,8 @@ export default function Contact({ user }) {
   });
   const [status, setStatus] = useState("");
   
-  // Use environment variable or fallback
-  const API_URL = import.meta.env.VITE_API_URL || "https://quickcart-3vqg.vercel.app";
+  // USE PRODUCTION URL
+  const API_URL = "https://quickcart-55wwwtf1v-hermela-getachews-projects-6c383e2f.vercel.app";
 
   // === ADMIN REPLY STATES ===
   const [replyEmail, setReplyEmail] = useState("");
@@ -26,7 +26,7 @@ export default function Contact({ user }) {
     setStatus("Sending...");
 
     try {
-      const res = await fetch(`${API_URL}/api/contact`, { // Fixed: added /api
+      const res = await fetch(`${API_URL}/api/contact`, { // ✅ Fixed endpoint
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -46,7 +46,6 @@ export default function Contact({ user }) {
   };
 
   // === ADMIN: SEND REPLY TO CUSTOMER ===
-  // NOTE: You need to create this endpoint in your backend first!
   const sendReply = async () => {
     if (!replyEmail || !replyMsg) return;
 
@@ -54,7 +53,7 @@ export default function Contact({ user }) {
     setReplyStatus("");
 
     try {
-      const res = await fetch(`${API_URL}/api/reply`, { // Fixed: added /api
+      const res = await fetch(`${API_URL}/api/reply`, { // ✅ Fixed endpoint
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -81,6 +80,7 @@ export default function Contact({ user }) {
     }
   };
 
+  // ... rest of your JSX code remains exactly the same
   return (
     <section className="contact-page">
       <div className="contact-container">
@@ -137,7 +137,7 @@ export default function Contact({ user }) {
         )}
 
         {/* === ADMIN REPLY BOX (ONLY FOR YOU) === */}
-        {user && user.email === "hermelagetachew999@gmail.com" && ( // Updated your email
+        {user && user.email === "hermelagetachew999@gmail.com" && (
           <div className="admin-reply-box">
             <h3>Admin: Reply to Customer</h3>
 

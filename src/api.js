@@ -1,86 +1,58 @@
 // src/api.js
-const BASE_URL = import.meta.env.VITE_API_URL;
+const API = "https://quickcart-55wwwtf1v-hermela-getachews-projects-6c383e2f.vercel.app"; 
 
-if (!BASE_URL) {
-  console.warn("VITE_API_URL not set, using default");
-}
-
-const API = BASE_URL || "https://quickcart-3vqg.vercel.app";
-
-const getToken = () => {
-  try {
-    return localStorage.getItem("token");
-  } catch (error) {
-    console.warn("Cannot access localStorage:", error);
-    return null;
-  }
-};
-
-const apiRequest = (endpoint, options = {}) => {
-  const url = `${API}${endpoint}`;
-  
-  const config = {
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    ...options,
-  };
-
-  // Add auth header if token exists
-  const token = getToken();
-  if (token && !endpoint.includes('/signup') && !endpoint.includes('/login')) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return fetch(url, config).then(async (response) => {
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || `HTTP error! status: ${response.status}`);
-    }
-    return data;
-  });
-};
+const getToken = () => localStorage.getItem("token");
 
 // === AUTH ===
 export const signup = (data) => 
-  apiRequest("/api/signup", {
+  fetch(`${API}/api/signup`, {
     method: "POST",
     body: JSON.stringify(data),
-  });
+    headers: { "Content-Type": "application/json" }
+  }).then(r => r.json());
 
 export const login = (data) => 
-  apiRequest("/api/login", {
+  fetch(`${API}/api/login`, {
     method: "POST",
     body: JSON.stringify(data),
-  });
+    headers: { "Content-Type": "application/json" }
+  }).then(r => r.json());
 
 // === ORDERS ===
 export const placeOrder = (data) => 
-  apiRequest("/api/orders", {
+  fetch(`${API}/api/orders`, {
     method: "POST",
     body: JSON.stringify(data),
-  });
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${getToken()}`
+    }
+  }).then(r => r.json());
 
 export const getMyOrders = () => 
-  apiRequest("/api/my-orders");
+  fetch(`${API}/api/my-orders`, {
+    headers: { "Authorization": `Bearer ${getToken()}` }
+  }).then(r => r.json());
 
 // === CONTACT ===
 export const contact = (data) =>
-  apiRequest("/api/contact", {
+  fetch(`${API}/api/contact`, {
     method: "POST",
     body: JSON.stringify(data),
-  });
+    headers: { "Content-Type": "application/json" }
+  }).then(r => r.json());
 
 // === PASSWORD RESET ===
 export const forgotPassword = (email) =>
-  apiRequest("/api/forgot-password", {
+  fetch(`${API}/api/forgot-password`, {
     method: "POST",
     body: JSON.stringify({ email }),
-  });
+    headers: { "Content-Type": "application/json" }
+  }).then(r => r.json());
 
 export const resetPassword = (data) =>
-  apiRequest("/api/reset-password", {
+  fetch(`${API}/api/reset-password`, {
     method: "POST",
-    body: JSON.stringify(data),
-  });
+    body: JSON.stringify(data), // { email, code, newPassword }
+    headers: { "Content-Type": "application/json" }
+  }).then(r => r.json());
