@@ -10,25 +10,28 @@ import nodemailer from "nodemailer";
 
 const app = express();
 
-// === CORS SETUP ===
-// Allow local dev URLs + production frontend URL
+// === PRODUCTION CORS CONFIGURATION ===
 const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "https://quickcart-gamma-green.vercel.app"
+  "https://quickcart-gamma-green.vercel.app",
+  "https://quickcart-3vqg.vercel.app",
+  "http://localhost:5173"
 ];
 
 app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS not allowed"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: allowedOrigins,
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 }));
+
+// Handle preflight requests
+// Handle preflight requests for ALL routes
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', allowedOrigins);
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.status(200).send();
+});
 
 app.use(express.json());
 
@@ -90,6 +93,44 @@ app.post("/api/contact", async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: "Failed to send" });
+  }
+});
+
+// === ADD REPLY ENDPOINT ===
+app.post("/api/reply", async (req, res) => {
+  const { customerEmail, customerName, replyMessage } = req.body;
+  
+  if (!customerEmail || !replyMessage) {
+    return res.status(400).json({ error: "Customer email and reply message required" });
+  }
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+  });
+
+  const mailOptions = {
+    from: `"QuickCart Support" <${process.env.EMAIL_USER}>`,
+    to: customerEmail,
+    subject: "Re: Your QuickCart Inquiry",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; background: #f4f9f4; border-radius: 10px;">
+        <h3 style="color: #1abc9c;">Hi ${customerName || 'there'},</h3>
+        <p>Thank you for contacting QuickCart. Here's our response:</p>
+        <p style="background: white; padding: 15px; border-left: 4px solid #1abc9c; margin: 15px 0;">
+          ${replyMessage.replace(/\n/g, "<br>")}
+        </p>
+        <p>If you have any further questions, feel free to reply to this email.</p>
+        <p>Best regards,<br><strong>QuickCart Team</strong></p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to send reply" });
   }
 });
 
@@ -225,14 +266,22 @@ app.get("/test-email", async (req, res) => {
 // === START SERVER ===
 const PORT = process.env.PORT || 5000;
 
-// Only start listening locally (not on Vercel)
-if (process.env.VERCEL) {
-  console.log("Running on Vercel serverless environment");
-} else {
+// Add a root route to test if server is working
+app.get("/", (req, res) => {
+  res.json({ 
+    success: true, 
+    message: "QuickCart API is running!",
+    timestamp: new Date().toISOString(),
+    version: "1.0.0"
+  });
+});
+
+// For Vercel serverless - export the app directly
+export default app;
+
+// Only start listening locally, not on Vercel
+if (!process.env.VERCEL) {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
-}
-
-export default app;
-
+} 
