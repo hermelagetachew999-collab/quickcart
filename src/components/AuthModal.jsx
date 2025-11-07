@@ -15,9 +15,8 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [sentCode, setSentCode] = useState(false);
   const [codeError, setCodeError] = useState("");
 
-  // src/components/AuthModal.jsx
-const API_URL = "https://quickcart-3vqg.vercel.app"; 
-
+  // Use environment variable instead of hardcoded URL
+  const API_URL = import.meta.env.VITE_API_URL || "https://quickcart-3vqg.vercel.app";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +24,7 @@ const API_URL = "https://quickcart-3vqg.vercel.app";
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? "/login" : "/signup";
+      const endpoint = isLogin ? "/api/login" : "/api/signup"; // Fixed: added /api
       const body = isLogin ? { email, password } : { name, email, password };
 
       const res = await fetch(`${API_URL}${endpoint}`, {
@@ -63,7 +62,7 @@ const API_URL = "https://quickcart-3vqg.vercel.app";
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/forgot-password`, {
+      const res = await fetch(`${API_URL}/api/forgot-password`, { // Fixed: added /api
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -90,7 +89,7 @@ const API_URL = "https://quickcart-3vqg.vercel.app";
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/reset-password`, {
+      const res = await fetch(`${API_URL}/api/reset-password`, { // Fixed: added /api
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code: verifyCode, newPassword }),

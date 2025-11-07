@@ -9,7 +9,9 @@ export default function Contact({ user }) {
     message: "",
   });
   const [status, setStatus] = useState("");
-const API_URL = "https://quickcart-3vqg.vercel.app";
+  
+  // Use environment variable or fallback
+  const API_URL = import.meta.env.VITE_API_URL || "https://quickcart-3vqg.vercel.app";
 
   // === ADMIN REPLY STATES ===
   const [replyEmail, setReplyEmail] = useState("");
@@ -24,17 +26,19 @@ const API_URL = "https://quickcart-3vqg.vercel.app";
     setStatus("Sending...");
 
     try {
-      const res = await fetch(`${API_URL}/contact`, {
+      const res = await fetch(`${API_URL}/api/contact`, { // Fixed: added /api
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
+      const data = await res.json(); // Parse response
+
       if (res.ok) {
         setStatus("Message sent! We'll reply soon.");
         setForm({ name: "", email: "", message: "" });
       } else {
-        setStatus("Failed. Try again.");
+        setStatus(data.error || "Failed. Try again.");
       }
     } catch (err) {
       setStatus("Network error. Is backend running?");
@@ -42,6 +46,7 @@ const API_URL = "https://quickcart-3vqg.vercel.app";
   };
 
   // === ADMIN: SEND REPLY TO CUSTOMER ===
+  // NOTE: You need to create this endpoint in your backend first!
   const sendReply = async () => {
     if (!replyEmail || !replyMsg) return;
 
@@ -49,7 +54,7 @@ const API_URL = "https://quickcart-3vqg.vercel.app";
     setReplyStatus("");
 
     try {
-      const res = await fetch(`${API_URL}/reply`, {
+      const res = await fetch(`${API_URL}/api/reply`, { // Fixed: added /api
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -59,11 +64,15 @@ const API_URL = "https://quickcart-3vqg.vercel.app";
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         setReplyStatus("Reply sent successfully!");
         setReplyMsg("");
+        setReplyEmail("");
+        setReplyName("");
       } else {
-        setReplyStatus("Failed to send reply.");
+        setReplyStatus(data.error || "Failed to send reply.");
       }
     } catch (err) {
       setReplyStatus("Network error.");
@@ -128,7 +137,7 @@ const API_URL = "https://quickcart-3vqg.vercel.app";
         )}
 
         {/* === ADMIN REPLY BOX (ONLY FOR YOU) === */}
-        {user && user.email === "yourgmail@gmail.com" && (
+        {user && user.email === "hermelagetachew999@gmail.com" && ( // Updated your email
           <div className="admin-reply-box">
             <h3>Admin: Reply to Customer</h3>
 
