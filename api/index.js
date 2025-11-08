@@ -1,165 +1,152 @@
-// ~/quickcart/server/index.js
 import express from 'express';
-import serverless from 'serverless-http';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
 
-// ---------- Load .env ----------
 dotenv.config();
 
-// ---------- Express ----------
 const app = express();
-app.use(cors());
+
+// CORS configuration
+// CORS configuration
+app.use(cors({
+  origin: [
+    'https://quickcart-frontend-beqlams6v.vercel.app', // NEW frontend URL
+    'https://quickcart-front-pb6cdlauc-hermela-getachews-projects-6c383e2f.vercel.app', // Keep old for reference
+    'http://localhost:5173'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
-// ---------- MongoDB ----------
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => console.error('MongoDB error:', err));
+// In-memory storage (replace with MongoDB later)
+const users = [];
+const products = [
+  { id: 1, name: 'Wireless Headphones', price: 99.99, image: '/images/headphones.jpg', description: 'High-quality wireless headphones with noise cancellation' },
+  { id: 2, name: 'Smart Watch', price: 199.99, image: '/images/smartwatch.jpg', description: 'Feature-rich smartwatch with health monitoring' },
+  { id: 3, name: 'Laptop Backpack', price: 49.99, image: '/images/backpack.jpg', description: 'Durable laptop backpack with USB charging port' },
+  { id: 4, name: 'Bluetooth Speaker', price: 79.99, image: '/images/speaker.jpg', description: 'Portable Bluetooth speaker with amazing sound quality' }
+];
 
-// ---------- Models ----------
-import User from './models/User.js';
-import Product from './models/Product.js';
-import Cart from './models/Cart.js';
+// ===== ROUTES =====
 
-// ---------- Nodemailer ----------
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+// Root route
+app.get('/', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'QuickCart API is running!',
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
+  });
 });
 
-// ---------- TEST ROUTE ----------
+// Test route
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Hello from QuickCart API!' });
+  res.json({ message: 'Hello from QuickCart API! Server is working.' });
 });
 
-// ---------- AUTH ROUTES ----------
+// Get all products
+app.get('/api/products', (req, res) => {
+  res.json({ success: true, products });
+});
+
+// User registration
 app.post('/api/register', async (req, res) => {
   const { name, email, password } = req.body;
+  
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
+
+  // Check if user exists
+  if (users.find(u => u.email === email)) {
+    return res.status(400).json({ error: 'User already exists with this email' });
+  }
+
   try {
-    const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ msg: 'User already exists' });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = { 
+      id: users.length + 1, 
+      name, 
+      email, 
+      password: hashedPassword,
+      createdAt: new Date().toISOString()
+    };
+    users.push(user);
 
-    const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashed });
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.json({ token, user: { id: user._id, name, email } });
-  } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'fallback-secret-123', { expiresIn: '7d' });
+    
+    res.json({ 
+      success: true,
+      token, 
+      user: { 
+        name: user.name, 
+        email: user.email 
+      },
+      message: 'Account created successfully!'
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Server error during registration' });
   }
 });
 
+// User login
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
-
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ msg: 'Invalid credentials' });
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.json({ token, user: { id: user._id, name: user.name, email } });
-  } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+  
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required' });
   }
-});
 
-// ---------- PRODUCT ROUTES ----------
-app.get('/api/products', async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.json(products);
-  } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+  const user = users.find(u => u.email === email);
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid email or password' });
   }
-});
 
-app.post('/api/products', async (req, res) => {
   try {
-    const product = await Product.create(req.body);
-    res.status(201).json(product);
-  } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
-  }
-});
-
-// ---------- CART ROUTES ----------
-app.get('/api/cart/:userId', async (req, res) => {
-  try {
-    let cart = await Cart.findOne({ userId: req.params.userId }).populate('items.productId');
-    if (!cart) {
-      cart = await Cart.create({ userId: req.params.userId, items: [] });
-    }
-    res.json(cart);
-  } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
-  }
-});
-
-app.post('/api/cart/add', async (req, res) => {
-  const { userId, productId, quantity } = req.body;
-  try {
-    let cart = await Cart.findOne({ userId });
-    if (!cart) {
-      cart = new Cart({ userId, items: [] });
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const existing = cart.items.find((i) => i.productId.toString() === productId);
-    if (existing) {
-      existing.quantity += quantity;
-    } else {
-      cart.items.push({ productId, quantity });
-    }
-
-    await cart.save();
-    await cart.populate('items.productId');
-    res.json(cart);
-  } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'fallback-secret-123', { expiresIn: '7d' });
+    
+    res.json({ 
+      success: true,
+      token, 
+      user: { 
+        name: user.name, 
+        email: user.email 
+      },
+      message: 'Login successful!'
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Server error during login' });
   }
 });
 
-app.post('/api/cart/remove', async (req, res) => {
-  const { userId, productId } = req.body;
-  try {
-    const cart = await Cart.findOne({ userId });
-    if (!cart) return res.status(404).json({ msg: 'Cart not found' });
-
-    cart.items = cart.items.filter((i) => i.productId.toString() !== productId);
-    await cart.save();
-    await cart.populate('items.productId');
-    res.json(cart);
-  } catch (err) {
-    res.status(500).json({ msg: 'Server error' });
-  }
-});
-
-// ---------- EMAIL ROUTE (example) ----------
+// Contact form
 app.post('/api/contact', async (req, res) => {
   const { name, email, message } = req.body;
-  const mailOptions = {
-    from: email,
-    to: process.env.EMAIL_USER,
-    subject: `Contact from ${name}`,
-    text: message,
-  };
-  try {
-    await transporter.sendMail(mailOptions);
-    res.json({ msg: 'Email sent' });
-  } catch (err) {
-    res.status(500).json({ msg: 'Email error' });
+  
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: 'All fields are required' });
   }
+
+  // Simulate email sending (in production, integrate with nodemailer)
+  console.log('Contact form submission:', { name, email, message });
+  
+  res.json({ 
+    success: true, 
+    message: 'Thank you for your message! We will get back to you soon.' 
+  });
 });
 
-// ---------- EXPORT FOR VERCEL ----------
-export const handler = serverless(app);
+// Export for Vercel
+export default app;

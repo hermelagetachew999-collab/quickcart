@@ -1,11 +1,10 @@
-// src/api.js
-const API = "https://quickcart-55wwwtf1v-hermela-getachews-projects-6c383e2f.vercel.app"; 
+const API = "https://quickcart-n42rplipb-hermela-getachews-projects-6c383e2f.vercel.app";
 
 const getToken = () => localStorage.getItem("token");
 
 // === AUTH ===
 export const signup = (data) => 
-  fetch(`${API}/api/signup`, {
+  fetch(`${API}/api/register`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" }
@@ -18,20 +17,10 @@ export const login = (data) =>
     headers: { "Content-Type": "application/json" }
   }).then(r => r.json());
 
-// === ORDERS ===
-export const placeOrder = (data) => 
-  fetch(`${API}/api/orders`, {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${getToken()}`
-    }
-  }).then(r => r.json());
-
-export const getMyOrders = () => 
-  fetch(`${API}/api/my-orders`, {
-    headers: { "Authorization": `Bearer ${getToken()}` }
+// === PRODUCTS ===
+export const getProducts = () => 
+  fetch(`${API}/api/products`, {
+    headers: { "Content-Type": "application/json" }
   }).then(r => r.json());
 
 // === CONTACT ===
@@ -42,17 +31,24 @@ export const contact = (data) =>
     headers: { "Content-Type": "application/json" }
   }).then(r => r.json());
 
-// === PASSWORD RESET ===
-export const forgotPassword = (email) =>
-  fetch(`${API}/api/forgot-password`, {
+// === ORDERS - Add placeOrder function ===
+export const placeOrder = (data) => 
+  fetch(`${API}/api/contact`, { // Using contact endpoint as placeholder
     method: "POST",
-    body: JSON.stringify({ email }),
-    headers: { "Content-Type": "application/json" }
+    body: JSON.stringify({
+      ...data,
+      type: 'order'
+    }),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${getToken()}`
+    }
   }).then(r => r.json());
 
-export const resetPassword = (data) =>
-  fetch(`${API}/api/reset-password`, {
-    method: "POST",
-    body: JSON.stringify(data), // { email, code, newPassword }
-    headers: { "Content-Type": "application/json" }
+export const getMyOrders = () => 
+  fetch(`${API}/api/products`, { // Using products endpoint as placeholder
+    headers: { 
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${getToken()}`
+    }
   }).then(r => r.json());

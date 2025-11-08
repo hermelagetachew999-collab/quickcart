@@ -100,4 +100,4 @@ export default function Cart({ cartItems, user, removeFromCart }) {
       )}
     </section>
   );
-}ssssssss
+}

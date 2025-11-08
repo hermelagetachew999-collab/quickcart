@@ -1,38 +1,32 @@
-// src/pages/Contact.jsx
 import React, { useState } from "react";
 
 export default function Contact({ user }) {
-  // === CONTACT FORM STATES ===
   const [form, setForm] = useState({
     name: "",
     email: "",
     message: "",
   });
   const [status, setStatus] = useState("");
-  
-  // USE PRODUCTION URL
-  const API_URL = "https://quickcart-55wwwtf1v-hermela-getachews-projects-6c383e2f.vercel.app";
+  const API_URL = "https://quickcart-n42rplipb-hermela-getachews-projects-6c383e2f.vercel.app";
 
-  // === ADMIN REPLY STATES ===
   const [replyEmail, setReplyEmail] = useState("");
   const [replyName, setReplyName] = useState("");
   const [replyMsg, setReplyMsg] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
   const [replyStatus, setReplyStatus] = useState("");
 
-  // === SEND CONTACT MESSAGE ===
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("Sending...");
 
     try {
-      const res = await fetch(`${API_URL}/api/contact`, { // ✅ Fixed endpoint
+      const res = await fetch(`${API_URL}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
-      const data = await res.json(); // Parse response
+      const data = await res.json();
 
       if (res.ok) {
         setStatus("Message sent! We'll reply soon.");
@@ -45,7 +39,6 @@ export default function Contact({ user }) {
     }
   };
 
-  // === ADMIN: SEND REPLY TO CUSTOMER ===
   const sendReply = async () => {
     if (!replyEmail || !replyMsg) return;
 
@@ -53,13 +46,13 @@ export default function Contact({ user }) {
     setReplyStatus("");
 
     try {
-      const res = await fetch(`${API_URL}/api/reply`, { // ✅ Fixed endpoint
+      const res = await fetch(`${API_URL}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerEmail: replyEmail,
-          customerName: replyName,
-          replyMessage: replyMsg,
+          name: replyName || "Admin",
+          email: replyEmail,
+          message: `ADMIN REPLY: ${replyMsg}`
         }),
       });
 
@@ -71,7 +64,7 @@ export default function Contact({ user }) {
         setReplyEmail("");
         setReplyName("");
       } else {
-        setReplyStatus(data.error || "Failed to send reply.");
+        setReplyStatus("Failed to send reply.");
       }
     } catch (err) {
       setReplyStatus("Network error.");
@@ -80,14 +73,12 @@ export default function Contact({ user }) {
     }
   };
 
-  // ... rest of your JSX code remains exactly the same
   return (
     <section className="contact-page">
       <div className="contact-container">
         <h2>Contact Us</h2>
         <p>We'd love to hear from you! Send us a message.</p>
 
-        {/* === CONTACT FORM === */}
         <form onSubmit={handleSubmit} className="contact-form">
           <div className="form-group">
             <label htmlFor="name">Your Name</label>
@@ -136,14 +127,13 @@ export default function Contact({ user }) {
           </p>
         )}
 
-        {/* === ADMIN REPLY BOX (ONLY FOR YOU) === */}
         {user && user.email === "hermelagetachew999@gmail.com" && (
           <div className="admin-reply-box">
             <h3>Admin: Reply to Customer</h3>
 
             <input
               type="email"
-              placeholder="Customer Email (e.g. hermi@test.com)"
+              placeholder="Customer Email"
               value={replyEmail}
               onChange={(e) => setReplyEmail(e.target.value)}
             />
