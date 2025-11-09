@@ -5,7 +5,7 @@ export default function ForgotPasswordModal({ onClose }) {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API_URL = "https://quickcart-backend-btcl.onrender.com";
+  const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
 
 
 

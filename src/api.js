@@ -1,4 +1,4 @@
-const API_URL = "https://quickcart-backend-btcl.onrender.com";
+const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
 
 const getToken = () => localStorage.getItem("token");
 

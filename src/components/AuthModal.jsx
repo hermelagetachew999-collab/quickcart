@@ -9,7 +9,7 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
 
-  const API_URL = "https://quickcart-backend-btcl.onrender.com";
+  const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
 
 
 
