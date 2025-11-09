@@ -37,7 +37,7 @@ const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
         setStatus(data.error || "Failed. Try again.");
       }
     } catch (err) {
-      setStatus("Network error. Is backend running?");
+      setStatus("Network error.");
     }
   };
 
