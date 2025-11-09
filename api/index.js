@@ -60,8 +60,8 @@ const products = [
 const resetCodes = new Map(); // store email → code
 
 
-// Root route
-app.get("/", (req, res) => {
+// Root route for Vercel deployment
+app.get("/api", (req, res) => {
   res.json({
     success: true,
     message: "QuickCart API is running!",
@@ -69,6 +69,7 @@ app.get("/", (req, res) => {
     version: "1.0.0",
   });
 });
+
 
 // Test route
 app.get("/api/test", (req, res) => {
@@ -236,5 +237,10 @@ app.post("/api/reset-password", async (req, res) => {
     res.status(500).json({ error: "Error resetting password" });
   }
 });
+if (process.env.NODE_ENV !== "production") {
+  app.listen(3001, () => {
+    console.log("Backend running on http://localhost:3001");
+  });
+}
 
 export default app;
