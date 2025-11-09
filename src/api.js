@@ -1,4 +1,4 @@
-const API = "https://quickcart-n42rplipb-hermela-getachews-projects-6c383e2f.vercel.app";
+const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
 
 const getToken = () => localStorage.getItem("token");
 

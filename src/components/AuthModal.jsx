@@ -9,7 +9,9 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
 
-  const API_URL = "https://quickcart-n42rplipb-hermela-getachews-projects-6c383e2f.vercel.app";
+  const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

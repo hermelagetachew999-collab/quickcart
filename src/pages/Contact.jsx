@@ -7,7 +7,9 @@ export default function Contact({ user }) {
     message: "",
   });
   const [status, setStatus] = useState("");
-  const API_URL = "https://quickcart-n42rplipb-hermela-getachews-projects-6c383e2f.vercel.app";
+const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
+
+
 
   const [replyEmail, setReplyEmail] = useState("");
   const [replyName, setReplyName] = useState("");
