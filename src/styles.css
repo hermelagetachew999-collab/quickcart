@@ -1117,3 +1117,14 @@ background: linear-gradient(to bottom right, #7a2362, #e2a7da, #000000);
     font-size: 1.3rem;
   }
 }
+.link-btn.small {
+  margin-top: 4px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: #007bff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  align-self: flex-end;
+}

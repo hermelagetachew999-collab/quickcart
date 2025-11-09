@@ -1,152 +1,238 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 dotenv.config();
 
 const app = express();
-
-// CORS configuration
-// CORS configuration
-app.use(cors({
-  origin: [
-    'https://quickcart-frontend-beqlams6v.vercel.app', // NEW frontend URL
-    'https://quickcart-front-pb6cdlauc-hermela-getachews-projects-6c383e2f.vercel.app', // Keep old for reference
-    'http://localhost:5173'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
 app.use(express.json());
+app.use(
+  cors({
+    origin: [
+      "https://quickcart-frontend-beqlams6v.vercel.app", // new
+      "https://quickcart-front-pb6cdlauc-hermela-getachews-projects-6c383e2f.vercel.app", // old
+      "http://localhost:5173",
+    ],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-// In-memory storage (replace with MongoDB later)
+
 const users = [];
 const products = [
-  { id: 1, name: 'Wireless Headphones', price: 99.99, image: '/images/headphones.jpg', description: 'High-quality wireless headphones with noise cancellation' },
-  { id: 2, name: 'Smart Watch', price: 199.99, image: '/images/smartwatch.jpg', description: 'Feature-rich smartwatch with health monitoring' },
-  { id: 3, name: 'Laptop Backpack', price: 49.99, image: '/images/backpack.jpg', description: 'Durable laptop backpack with USB charging port' },
-  { id: 4, name: 'Bluetooth Speaker', price: 79.99, image: '/images/speaker.jpg', description: 'Portable Bluetooth speaker with amazing sound quality' }
+  {
+    id: 1,
+    name: "Wireless Headphones",
+    price: 99.99,
+    image: "/images/headphones.jpg",
+    description: "High-quality wireless headphones with noise cancellation",
+  },
+  {
+    id: 2,
+    name: "Smart Watch",
+    price: 199.99,
+    image: "/images/smartwatch.jpg",
+    description: "Feature-rich smartwatch with health monitoring",
+  },
+  {
+    id: 3,
+    name: "Laptop Backpack",
+    price: 49.99,
+    image: "/images/backpack.jpg",
+    description: "Durable laptop backpack with USB charging port",
+  },
+  {
+    id: 4,
+    name: "Bluetooth Speaker",
+    price: 79.99,
+    image: "/images/speaker.jpg",
+    description: "Portable Bluetooth speaker with amazing sound quality",
+  },
 ];
 
-// ===== ROUTES =====
+const resetCodes = new Map(); // store email → code
+
 
 // Root route
-app.get('/', (req, res) => {
-  res.json({ 
-    success: true, 
-    message: 'QuickCart API is running!',
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "QuickCart API is running!",
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    version: "1.0.0",
   });
 });
 
 // Test route
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Hello from QuickCart API! Server is working.' });
+app.get("/api/test", (req, res) => {
+  res.json({ message: "Hello from QuickCart API! Server is working." });
 });
 
-// Get all products
-app.get('/api/products', (req, res) => {
+// Get products
+app.get("/api/products", (req, res) => {
   res.json({ success: true, products });
 });
 
-// User registration
-app.post('/api/register', async (req, res) => {
+// Register
+app.post("/api/register", async (req, res) => {
   const { name, email, password } = req.body;
-  
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
 
-  // Check if user exists
-  if (users.find(u => u.email === email)) {
-    return res.status(400).json({ error: 'User already exists with this email' });
-  }
+  if (!name || !email || !password)
+    return res.status(400).json({ error: "All fields are required" });
+
+  if (users.find((u) => u.email === email))
+    return res.status(400).json({ error: "User already exists" });
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = { 
-      id: users.length + 1, 
-      name, 
-      email, 
-      password: hashedPassword,
-      createdAt: new Date().toISOString()
+    const hashed = await bcrypt.hash(password, 10);
+    const user = {
+      id: users.length + 1,
+      name,
+      email,
+      password: hashed,
+      createdAt: new Date().toISOString(),
     };
     users.push(user);
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'fallback-secret-123', { expiresIn: '7d' });
-    
-    res.json({ 
+    const token = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET || "fallback-secret",
+      { expiresIn: "7d" }
+    );
+
+    res.json({
       success: true,
-      token, 
-      user: { 
-        name: user.name, 
-        email: user.email 
-      },
-      message: 'Account created successfully!'
+      token,
+      user: { name: user.name, email: user.email },
+      message: "Account created successfully!",
     });
-  } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Server error during registration' });
+  } catch (err) {
+    console.error("Registration error:", err);
+    res.status(500).json({ error: "Server error during registration" });
   }
 });
 
-// User login
-app.post('/api/login', async (req, res) => {
+// Login
+app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
-  
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
-  }
 
-  const user = users.find(u => u.email === email);
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid email or password' });
-  }
+  if (!email || !password)
+    return res.status(400).json({ error: "Please fill out all fields to create your account."});
+
+  const user = users.find((u) => u.email === email);
+  if (!user) return res.status(401).json({ error: "Invalid email or password" });
 
   try {
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
+    if (!validPassword)
+      return res.status(401).json({ error: "Invalid email or password" });
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET || 'fallback-secret-123', { expiresIn: '7d' });
-    
-    res.json({ 
+    const token = jwt.sign(
+      { id: user.id },
+      process.env.JWT_SECRET || "fallback-secret",
+      { expiresIn: "7d" }
+    );
+
+    res.json({
       success: true,
-      token, 
-      user: { 
-        name: user.name, 
-        email: user.email 
-      },
-      message: 'Login successful!'
+      token,
+      user: { name: user.name, email: user.email },
+      message: "Login successful!",
     });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Server error during login' });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ error: "Oops! Something went wrong while creating your account. Please try again later." });
   }
 });
 
-// Contact form
-app.post('/api/contact', async (req, res) => {
+// Contact
+app.post("/api/contact", (req, res) => {
   const { name, email, message } = req.body;
-  
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
 
-  // Simulate email sending (in production, integrate with nodemailer)
-  console.log('Contact form submission:', { name, email, message });
-  
-  res.json({ 
-    success: true, 
-    message: 'Thank you for your message! We will get back to you soon.' 
+  if (!name || !email || !message)
+    return res.status(400).json({ error: "All fields are required" });
+
+  console.log("Contact form:", { name, email, message });
+
+  res.json({
+    success: true,
+    message: "Thank you for your message! We will get back to you soon.",
   });
 });
 
-// Export for Vercel
+// ========== FORGOT PASSWORD ==========
+app.post("/api/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: "Email is required" });
+
+  const user = users.find((u) => u.email === email);
+  if (!user)
+    return res.status(404).json({ error: "No account found with this email" });
+
+  try {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    resetCodes.set(email, code);
+
+    // Setup email transporter (optional)
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `"QuickCart Support" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "QuickCart Password Reset Code",
+      text: `Your QuickCart verification code is: ${code}`,
+    };
+
+    
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS)
+      await transporter.sendMail(mailOptions);
+
+    console.log(`Password reset code for ${email}: ${code}`);
+    res.json({
+      success: true,
+      message: "Verification code sent to your email.",
+    });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    res.status(500).json({ error: "Failed to send code. Try again later." });
+  }
+});
+
+// ========== RESET PASSWORD ==========
+app.post("/api/reset-password", async (req, res) => {
+  const { email, code, newPassword } = req.body;
+
+  if (!email || !code || !newPassword)
+    return res.status(400).json({ error: "All fields are required" });
+
+  const validCode = resetCodes.get(email);
+  if (!validCode || validCode !== code)
+    return res.status(400).json({ error: "Invalid or expired code" });
+
+  const user = users.find((u) => u.email === email);
+  if (!user) return res.status(404).json({ error: "User not found" });
+
+  try {
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    resetCodes.delete(email);
+
+    res.json({ success: true, message: "Password reset successful!" });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    res.status(500).json({ error: "Error resetting password" });
+  }
+});
+
 export default app;
