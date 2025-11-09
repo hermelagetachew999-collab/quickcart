@@ -7,7 +7,7 @@ export default function Contact({ user }) {
     message: "",
   });
   const [status, setStatus] = useState("");
-const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
+const API_URL = "https://quickcart-backend-btcl.onrender.com";
 
 
 
@@ -48,7 +48,7 @@ const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
     setReplyStatus("");
 
     try {
-      const res = await fetch(`${API_URL}/api/contact`, {
+      const res = await fetch(`${API_URL}/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

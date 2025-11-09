@@ -5,7 +5,7 @@ export default function ForgotPasswordModal({ onClose }) {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
+  const API_URL = "https://quickcart-backend-btcl.onrender.com";
 
 
 
@@ -15,7 +15,7 @@ export default function ForgotPasswordModal({ onClose }) {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/forgot-password`, {
+      const res = await fetch(`${API_URL}/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

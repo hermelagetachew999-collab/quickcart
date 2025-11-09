@@ -9,7 +9,7 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
 
-  const API_URL = "https://quickcart-backend-btcl.onrender.com/api";
+  const API_URL = "https://quickcart-backend-btcl.onrender.com";
 
 
 
@@ -19,7 +19,7 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? "/api/login" : "/api/register";
+      const endpoint = isLogin ? "/login" : "/register";
       const body = isLogin ? { email, password } : { name, email, password };
 
       const res = await fetch(`${API_URL}${endpoint}`, {
