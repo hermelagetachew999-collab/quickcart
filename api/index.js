@@ -237,10 +237,5 @@ app.post("/api/reset-password", async (req, res) => {
     res.status(500).json({ error: "Error resetting password" });
   }
 });
-if (process.env.NODE_ENV !== "production") {
-  app.listen(3001, () => {
-    console.log("Backend running on http://localhost:3001");
-  });
-}
 
 export default app;
