@@ -4,14 +4,14 @@ const getToken = () => localStorage.getItem("token");
 
 // === AUTH ===
 export const signup = (data) => 
-  fetch(`${API}/api/register`, {
+  fetch(`${API}/register`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" }
   }).then(r => r.json());
 
 export const login = (data) => 
-  fetch(`${API}/api/login`, {
+  fetch(`${API}/login`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" }
@@ -19,13 +19,13 @@ export const login = (data) =>
 
 // === PRODUCTS ===
 export const getProducts = () => 
-  fetch(`${API}/api/products`, {
+  fetch(`${API}/products`, {
     headers: { "Content-Type": "application/json" }
   }).then(r => r.json());
 
 // === CONTACT ===
 export const contact = (data) =>
-  fetch(`${API}/api/contact`, {
+  fetch(`${API}/contact`, {
     method: "POST",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" }
@@ -33,7 +33,7 @@ export const contact = (data) =>
 
 // === ORDERS - Add placeOrder function ===
 export const placeOrder = (data) => 
-  fetch(`${API}/api/contact`, { // Using contact endpoint as placeholder
+  fetch(`${API}/contact`, { // Using contact endpoint as placeholder
     method: "POST",
     body: JSON.stringify({
       ...data,
@@ -46,7 +46,7 @@ export const placeOrder = (data) =>
   }).then(r => r.json());
 
 export const getMyOrders = () => 
-  fetch(`${API}/api/products`, { // Using products endpoint as placeholder
+  fetch(`${API}/products`, { // Using products endpoint as placeholder
     headers: { 
       "Content-Type": "application/json",
       "Authorization": `Bearer ${getToken()}`
