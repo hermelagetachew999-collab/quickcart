@@ -1,17 +1,9 @@
 import React, { useState } from "react";
+import { contact } from "../api";
 
 export default function Contact({ user }) {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState("");
-const API_URL = "https://quickcart-bips.onrender.com";
-
-
-
-
   const [replyEmail, setReplyEmail] = useState("");
   const [replyName, setReplyName] = useState("");
   const [replyMsg, setReplyMsg] = useState("");
@@ -22,54 +14,36 @@ const API_URL = "https://quickcart-bips.onrender.com";
     e.preventDefault();
     setStatus("Sending...");
 
-    try {
-      const res = await fetch(`${API_URL}/api/contact`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setStatus("Message sent! We'll reply soon.");
-        setForm({ name: "", email: "", message: "" });
-      } else {
-        setStatus(data.error || "Failed. Try again.");
-      }
-    } catch (err) {
-      setStatus("Network error.");
+    const res = await contact(form);
+    if (res.success) {
+      setStatus("Message sent! We'll reply soon.");
+      setForm({ name: "", email: "", message: "" });
+    } else {
+      setStatus(res.error || "Failed. Try again.");
     }
   };
 
   const sendReply = async () => {
     if (!replyEmail || !replyMsg) return;
-
     setReplyLoading(true);
     setReplyStatus("");
 
     try {
-      const res = await fetch(`${API_URL}/contact`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: replyName || "Admin",
-          email: replyEmail,
-          message: `ADMIN REPLY: ${replyMsg}`
-        }),
+      const res = await contact({
+        name: replyName || "Admin",
+        email: replyEmail,
+        message: `ADMIN REPLY: ${replyMsg}`,
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (res.success) {
         setReplyStatus("Reply sent successfully!");
         setReplyMsg("");
         setReplyEmail("");
         setReplyName("");
       } else {
-        setReplyStatus("Failed to send reply.");
+        setReplyStatus(res.error || "Failed to send reply.");
       }
-    } catch (err) {
+    } catch {
       setReplyStatus("Network error.");
     } finally {
       setReplyLoading(false);
@@ -84,9 +58,8 @@ const API_URL = "https://quickcart-bips.onrender.com";
 
         <form onSubmit={handleSubmit} className="contact-form">
           <div className="form-group">
-            <label htmlFor="name">Your Name</label>
+            <label>Your Name</label>
             <input
-              id="name"
               type="text"
               placeholder="Write your name here..."
               value={form.name}
@@ -96,9 +69,8 @@ const API_URL = "https://quickcart-bips.onrender.com";
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Your Email</label>
+            <label>Your Email</label>
             <input
-              id="email"
               type="email"
               placeholder="username@gmail.com"
               value={form.email}
@@ -108,9 +80,8 @@ const API_URL = "https://quickcart-bips.onrender.com";
           </div>
 
           <div className="form-group">
-            <label htmlFor="message">Message</label>
+            <label>Message</label>
             <textarea
-              id="message"
               rows="6"
               placeholder="Type your message here..."
               value={form.message}
@@ -130,31 +101,27 @@ const API_URL = "https://quickcart-bips.onrender.com";
           </p>
         )}
 
-        {user && user.email === "hermelagetachew999@gmail.com" && (
+        {user?.email === "hermelagetachew999@gmail.com" && (
           <div className="admin-reply-box">
             <h3>Admin: Reply to Customer</h3>
-
             <input
               type="email"
               placeholder="Customer Email"
               value={replyEmail}
               onChange={(e) => setReplyEmail(e.target.value)}
             />
-
             <input
               type="text"
               placeholder="Customer Name (optional)"
               value={replyName}
               onChange={(e) => setReplyName(e.target.value)}
             />
-
             <textarea
-              placeholder="Type your reply here..."
               rows="4"
+              placeholder="Type your reply here..."
               value={replyMsg}
               onChange={(e) => setReplyMsg(e.target.value)}
             />
-
             <button
               onClick={sendReply}
               disabled={!replyEmail || !replyMsg || replyLoading}
@@ -162,7 +129,6 @@ const API_URL = "https://quickcart-bips.onrender.com";
             >
               {replyLoading ? "Sending..." : "Send Reply"}
             </button>
-
             {replyStatus && (
               <p className={`status ${replyStatus.includes("sent") ? "success" : "error"}`}>
                 {replyStatus}

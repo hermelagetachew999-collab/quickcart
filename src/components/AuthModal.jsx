@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ForgotPasswordModal from "./ForgotPasswordModal";
+const API_URL = "https://quickcart-bips.onrender.com";
 
 export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [email, setEmail] = useState("");
@@ -8,10 +9,6 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
-const API_URL = "https://quickcart-bips.onrender.com";
-
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,7 +41,7 @@ const API_URL = "https://quickcart-bips.onrender.com";
       } else {
         setError(data.error || "Something went wrong");
       }
-    } catch (err) {
+    } catch {
       setError("Network error. Try again.");
     } finally {
       setLoading(false);
@@ -56,41 +53,13 @@ const API_URL = "https://quickcart-bips.onrender.com";
       <div className="modal-overlay" onClick={onClose}>
         <div className="modal-content" onClick={(e) => e.stopPropagation()}>
           <h2>{isLogin ? "Login" : "Signup"}</h2>
-
           <form onSubmit={handleSubmit}>
-            {!isLogin && (
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            )}
+            {!isLogin && <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />}
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
 
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-
-            {/*  “Forgot password?” link goes right here  */}
             {isLogin && (
-              <button
-                type="button"
-                className="link-btn small"
-                onClick={() => setShowForgot(true)}
-              >
+              <button type="button" className="link-btn small" onClick={() => setShowForgot(true)}>
                 Forgot password?
               </button>
             )}
@@ -99,35 +68,17 @@ const API_URL = "https://quickcart-bips.onrender.com";
               {loading ? "Loading..." : isLogin ? "Login" : "Create Account"}
             </button>
 
-            {error && (
-              <p
-                className={`status ${
-                  error.includes("created") ? "success" : "error"
-                }`}
-              >
-                {error}
-              </p>
-            )}
+            {error && <p className={`status ${error.includes("created") ? "success" : "error"}`}>{error}</p>}
 
-            <button
-              type="button"
-              className="link-btn"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError("");
-              }}
-            >
+            <button type="button" className="link-btn" onClick={() => { setIsLogin(!isLogin); setError(""); }}>
               {isLogin ? "Need an account? Signup" : "Have an account? Login"}
             </button>
           </form>
 
-          <button className="close-btn" onClick={onClose}>
-            ×
-          </button>
+          <button className="close-btn" onClick={onClose}>×</button>
         </div>
       </div>
 
-      {/* Forgot Password Modal */}
       {showForgot && <ForgotPasswordModal onClose={() => setShowForgot(false)} />}
     </>
   );
