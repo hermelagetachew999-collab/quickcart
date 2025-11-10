@@ -7,7 +7,8 @@ export default function Contact({ user }) {
     message: "",
   });
   const [status, setStatus] = useState("");
-const API_URL = "https://quickcart-backend-btcl.onrender.com";
+const API_URL = "https://quickcart-bips.onrender.com";
+
 
 
 
