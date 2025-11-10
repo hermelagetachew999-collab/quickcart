@@ -14,7 +14,7 @@ const API_URL = "https://quickcart-bips.onrender.com";
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/forgot-password`, {
+      const res = await fetch(`${API_URL}/api/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),

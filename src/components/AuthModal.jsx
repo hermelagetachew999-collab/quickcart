@@ -19,7 +19,7 @@ const API_URL = "https://quickcart-bips.onrender.com";
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? "/login" : "/register";
+      const endpoint = isLogin ? "/api/login" : "/api/register";
       const body = isLogin ? { email, password } : { name, email, password };
 
       const res = await fetch(`${API_URL}${endpoint}`, {
@@ -84,7 +84,7 @@ const API_URL = "https://quickcart-bips.onrender.com";
               required
             />
 
-            {/* 👇 “Forgot password?” link goes right here 👇 */}
+            {/*  “Forgot password?” link goes right here  */}
             {isLogin && (
               <button
                 type="button"
