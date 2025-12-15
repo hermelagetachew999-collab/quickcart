@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const API_URL = "https://quickcart-bips.onrender.com";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 export default function ForgotPasswordModal({ onClose }) {
   const [email, setEmail] = useState("");
@@ -26,7 +26,7 @@ export default function ForgotPasswordModal({ onClose }) {
       const data = await res.json();
 
       if (res.ok) {
-        setStatus("✅ Reset code sent! Check server logs if email is unavailable.");
+        setStatus("✅ Reset code sent!");
         setStep(2); // move to step 2 to enter code and new password
       } else {
         setStatus(data.error || "Something went wrong.");
