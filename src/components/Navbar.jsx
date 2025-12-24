@@ -7,7 +7,8 @@ export default function Navbar({ user, setUser, cartCount }) {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showLogout, setShowLogout] = useState(false); // NEW: TOGGLE LOGOUT
+  const [showLogout, setShowLogout] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // NEW: MOBILE MENU STATE
   const navigate = useNavigate();
 
   // === GLOBAL SEARCH: FILTERS HOME PAGE ===
@@ -19,19 +20,36 @@ export default function Navbar({ user, setUser, cartCount }) {
     } else {
       navigate("/");
     }
+    setMobileMenuOpen(false); // Close mobile menu after search
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
     setShowLogout(false);
+    setMobileMenuOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
   };
 
   return (
     <nav className="navbar">
       <h2 className="logo">
-        <Link to="/">Shopping Cart</Link>
+        <Link to="/" onClick={closeMobileMenu}>QuickCart</Link>
       </h2>
+
+      {/* HAMBURGER MENU BUTTON */}
+      <button
+        className="hamburger-menu"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        aria-label="Toggle menu"
+      >
+        <span className={mobileMenuOpen ? "active" : ""}></span>
+        <span className={mobileMenuOpen ? "active" : ""}></span>
+        <span className={mobileMenuOpen ? "active" : ""}></span>
+      </button>
 
       {/* SEARCH BAR — FILTERS HOME PAGE */}
       <form onSubmit={handleSearch} className="navbar-search">
@@ -47,9 +65,10 @@ export default function Navbar({ user, setUser, cartCount }) {
         </button>
       </form>
 
-      <ul className="nav-links">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/cart">Cart ({cartCount})</Link></li>
+      {/* NAVIGATION LINKS */}
+      <ul className={`nav-links ${mobileMenuOpen ? "mobile-active" : ""}`}>
+        <li><Link to="/" onClick={closeMobileMenu}>Home</Link></li>
+        <li><Link to="/cart" onClick={closeMobileMenu}>Cart ({cartCount})</Link></li>
 
         {/* AUTH / PROFILE */}
         <li className="auth-item">
@@ -78,13 +97,14 @@ export default function Navbar({ user, setUser, cartCount }) {
               onClick={() => {
                 setIsLogin(true);
                 setShowAuthModal(true);
+                closeMobileMenu();
               }}
             >
               Login / Signup
             </button>
           )}
         </li>
-        <li><Link to="/contact">Contact</Link></li>
+        <li><Link to="/contact" onClick={closeMobileMenu}>Contact</Link></li>
       </ul>
 
       {/* AUTH MODAL */}
