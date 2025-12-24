@@ -18,7 +18,7 @@ body {
 .navbar {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   padding: 1rem 5%;
   background: linear-gradient(to bottom right, #7a2362, #e2a7da, #000000);
   position: sticky;
@@ -26,6 +26,8 @@ body {
   z-index: 1000;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  flex-wrap: nowrap;
+  gap: 1rem;
 }
 
 .logo a {
@@ -40,7 +42,9 @@ body {
   position: relative;
   flex: 1;
   max-width: 500px;
-  margin: 0 2rem;
+  margin: 0 1rem;
+  display: flex;
+  align-items: center;
 }
 
 .navbar-search-input {
