@@ -1391,6 +1391,9 @@ body {
   /* Navbar mobile */
   /* Navbar mobile */
   .navbar {
+    display: flex;
+    flex-direction: row;
+    /* Ensure horizontal */
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
@@ -1414,35 +1417,33 @@ body {
 
   .navbar-search {
     order: 2;
+    min-width: 0;
+    /* Allow shrinking */
     width: auto;
-    max-width: none;
     flex: 1;
     margin: 0 0.5rem;
     display: flex;
     align-items: center;
   }
 
-  .navbar-search-input {
-    width: 100%;
-    padding: 0.6rem;
-    font-size: 0.9rem;
-  }
-
-  .search-btn {
-    display: none;
-    /* Hide search button text on mobile to save space, rely on icon or input enter */
-  }
-
+  /* Mobile Menu Drawer */
   .nav-links {
     position: fixed;
     top: 70px;
     right: -100%;
-    width: 280px;
+    width: 100%;
+    /* Full width for horizontal items */
+    max-width: 320px;
     height: calc(100vh - 70px);
     background: linear-gradient(to bottom, #2c3e50, #34495e);
-    flex-direction: column;
-    padding: 2rem 1rem;
-    gap: 0;
+    display: flex;
+    flex-direction: row;
+    /* Horizontal items */
+    flex-wrap: wrap;
+    /* Wrap if needed */
+    align-content: flex-start;
+    padding: 1.5rem;
+    gap: 1rem;
     transition: right 0.3s ease;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
     overflow-y: auto;
@@ -1454,8 +1455,11 @@ body {
   }
 
   .nav-links li {
-    width: 100%;
-    margin-bottom: 0.5rem;
+    width: auto;
+    /* Allow sizing based on content or flex */
+    flex-grow: 1;
+    text-align: center;
+    margin-bottom: 0;
   }
 
   .nav-links a {
