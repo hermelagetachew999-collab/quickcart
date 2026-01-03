@@ -3,15 +3,14 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthModal from "./AuthModal";
 
-export default function Navbar({ user, setUser, cartCount }) {
+export default function Navbar({ user, setUser, cartCount, categories }) {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showLogout, setShowLogout] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // NEW: MOBILE MENU STATE
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // === GLOBAL SEARCH: FILTERS HOME PAGE ===
   const handleSearch = (e) => {
     e.preventDefault();
     const term = searchTerm.trim();
@@ -20,7 +19,7 @@ export default function Navbar({ user, setUser, cartCount }) {
     } else {
       navigate("/");
     }
-    setMobileMenuOpen(false); // Close mobile menu after search
+    setMobileMenuOpen(false);
   };
 
   const handleLogout = () => {
@@ -40,7 +39,6 @@ export default function Navbar({ user, setUser, cartCount }) {
         <Link to="/" onClick={closeMobileMenu}>QuickCart</Link>
       </h2>
 
-      {/* HAMBURGER MENU BUTTON */}
       <button
         className="hamburger-menu"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -51,7 +49,6 @@ export default function Navbar({ user, setUser, cartCount }) {
         <span className={mobileMenuOpen ? "active" : ""}></span>
       </button>
 
-      {/* SEARCH BAR — FILTERS HOME PAGE */}
       <form onSubmit={handleSearch} className="navbar-search">
         <input
           type="text"
@@ -60,21 +57,36 @@ export default function Navbar({ user, setUser, cartCount }) {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <button type="submit" className="search-btn">
-          Search
-        </button>
+        {/* Search button removed as requested */}
       </form>
 
-      {/* NAVIGATION LINKS */}
       <ul className={`nav-links ${mobileMenuOpen ? "mobile-active" : ""}`}>
         <li><Link to="/" onClick={closeMobileMenu}>Home</Link></li>
         <li><Link to="/cart" onClick={closeMobileMenu}>Cart ({cartCount})</Link></li>
+        <li><Link to="/contact" onClick={closeMobileMenu}>Contact</Link></li>
 
-        {/* AUTH / PROFILE */}
+        {/* Categories for Mobile Menu */}
+        {mobileMenuOpen && categories && (
+          <li className="mobile-only-categories">
+            <span style={{ color: "#fff", fontWeight: "bold", display: "block", marginTop: "1rem" }}>Collections</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", paddingLeft: "0.5rem", marginTop: "0.5rem" }}>
+              {categories.slice(0, 10).map(cat => (
+                <Link
+                  key={cat}
+                  to={`/?category=${encodeURIComponent(cat)}`}
+                  onClick={closeMobileMenu}
+                  style={{ color: "#ddd", fontSize: "0.9rem" }}
+                >
+                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </Link>
+              ))}
+            </div>
+          </li>
+        )}
+
         <li className="auth-item">
           {user ? (
             <div className="profile-container">
-              {/* PROFILE AVATAR (FIRST LETTER) */}
               <div
                 className="profile-avatar"
                 onClick={() => setShowLogout(!showLogout)}
@@ -82,7 +94,6 @@ export default function Navbar({ user, setUser, cartCount }) {
                 {user.email.charAt(0).toUpperCase()}
               </div>
 
-              {/* LOGOUT DROPDOWN */}
               {showLogout && (
                 <div className="logout-dropdown">
                   <button onClick={handleLogout} className="logout-btn">
@@ -104,10 +115,8 @@ export default function Navbar({ user, setUser, cartCount }) {
             </button>
           )}
         </li>
-        <li><Link to="/contact" onClick={closeMobileMenu}>Contact</Link></li>
       </ul>
 
-      {/* AUTH MODAL */}
       {showAuthModal && !user && (
         <AuthModal
           isLogin={isLogin}
