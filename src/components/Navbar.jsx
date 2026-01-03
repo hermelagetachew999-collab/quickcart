@@ -70,7 +70,7 @@ export default function Navbar({ user, setUser, cartCount, categories }) {
           <li className="mobile-categories-section">
             <span className="mobile-section-title">Collections</span>
             <div className="mobile-category-list">
-              {categories.slice(0, 10).map(cat => (
+              {categories.slice(0, 14).map(cat => (
                 <Link
                   key={cat}
                   to={`/?category=${encodeURIComponent(cat)}`}
