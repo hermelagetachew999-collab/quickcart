@@ -13,19 +13,19 @@ export default function Footer() {
         <div className="footer-section">
           <h4>Quick Links</h4>
           <ul className="footer-links">
-            <li><Link to="/about">About Us</Link></li>
-            <li><Link to="/contact">Contact</Link></li>
-            <li><Link to="/privacy">Privacy Policy</Link></li>
-            <li><Link to="/terms">Terms of Service</Link></li>
+            <li><Link to="/about" target="_blank" rel="noopener noreferrer">About Us</Link></li>
+            <li><Link to="/contact" target="_blank" rel="noopener noreferrer">Contact</Link></li>
+            <li><Link to="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link></li>
+            <li><Link to="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</Link></li>
           </ul>
         </div>
 
         <div className="footer-section">
           <h4>Customer Service</h4>
           <ul className="footer-links">
-            <li><Link to="/cart">Shopping Cart</Link></li>
-            <li><Link to="/">Browse Products</Link></li>
-            <li><Link to="/contact">Help & Support</Link></li>
+            <li><Link to="/cart" target="_blank" rel="noopener noreferrer">Shopping Cart</Link></li>
+            <li><Link to="/" target="_blank" rel="noopener noreferrer">Browse Products</Link></li>
+            <li><Link to="/contact" target="_blank" rel="noopener noreferrer">Help & Support</Link></li>
           </ul>
         </div>
 

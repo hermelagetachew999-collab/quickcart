@@ -109,6 +109,22 @@ body {
   color: var(--primary);
 }
 
+.auth-btn {
+  background: transparent !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auth-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  transform: translateY(-1px);
+}
+
 /* ========== HOME & PRODUCT GRID ========== */
 .home {
   padding: 1rem 0 3rem;
@@ -240,13 +256,48 @@ body {
   color: var(--primary);
 }
 
-.cart-remove-btn {
+.remove-btn {
   background: #ef4444;
+  /* Bright red as requested */
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  /* Increased size */
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+  background: #dc2626;
+  transform: scale(1.05);
+  /* Hover effect */
+}
+
+/* Checkout Button */
+.checkout-btn {
+  display: block;
+  margin: 2rem auto;
+  padding: 1rem 3rem;
+  /* Increased size */
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  /* Increased size */
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-btn:hover {
+  background: #0ea5e9;
+  transform: scale(1.05);
+  /* Hover effect */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
 }
 
 /* ========== AUTH & MODALS ========== */
@@ -303,6 +354,32 @@ body {
   border-radius: 10px;
   font-weight: bold;
   cursor: pointer;
+  margin-top: 0.5rem;
+}
+
+/* LINK BUTTONS (Forgot Password, Need Account) */
+.link-btn {
+  background: transparent !important;
+  border: none;
+  color: var(--primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  align-self: flex-end;
+  /* Align right as requested */
+  transition: color 0.2s;
+  padding: 0;
+  font-weight: 600;
+}
+
+.link-btn:hover {
+  color: var(--secondary);
+  text-decoration: underline;
+}
+
+.link-btn.small {
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .close-btn {
