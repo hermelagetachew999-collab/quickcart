@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 
 const localProducts = [ /* your 19 products */];
 
-export default function Home({ addToCart }) {
+export default function Home({ addToCart, categoriesProp }) {
   const [allProducts, setAllProducts] = useState([...localProducts]);
   const [products, setProducts] = useState([...localProducts]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,17 +15,25 @@ export default function Home({ addToCart }) {
   const [initialLoad, setInitialLoad] = useState(true);
   const location = useLocation();
 
-  // === GET SEARCH FROM URL (NAVBAR) ===
+  // === SYNC CATEGORIES FROM PROP ===
+  useEffect(() => {
+    if (categoriesProp && categoriesProp.length > 1) {
+      setCategories(categoriesProp);
+    }
+  }, [categoriesProp]);
+
+  // === GET SEARCH & CATEGORY FROM URL ===
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const query = params.get("search") || "";
+    const cat = params.get("category") || "All";
     setSearchTerm(query);
+    setSelectedCategory(cat);
   }, [location.search]);
 
-  // === 1. CACHE ALL 194+ PRODUCTS & CATEGORIES ===
+  // === 1. CACHE ALL 194+ PRODUCTS ===
   useEffect(() => {
     const cachedProducts = localStorage.getItem("quickcart_all_products");
-    const cachedCats = localStorage.getItem("quickcart_categories");
 
     if (cachedProducts) {
       const parsed = JSON.parse(cachedProducts);
@@ -34,20 +42,8 @@ export default function Home({ addToCart }) {
       setInitialLoad(false);
     }
 
-    if (cachedCats) {
-      setCategories(JSON.parse(cachedCats));
-    }
-
     const loadData = async () => {
       try {
-        // Fetch Categories
-        const catRes = await fetch("https://dummyjson.com/products/category-list");
-        const catData = await catRes.json();
-        const fullCats = ["All", ...catData];
-        setCategories(fullCats);
-        localStorage.setItem("quickcart_categories", JSON.stringify(fullCats));
-
-        // Fetch Products
         const response = await fetch("https://dummyjson.com/products?limit=194");
         const data = await response.json();
         const apiProducts = (data.products || []).map(p => ({
@@ -86,59 +82,45 @@ export default function Home({ addToCart }) {
     setProducts(filtered);
   }, [searchTerm, selectedCategory, allProducts]);
 
-  // === CATEGORY STYLE HELPERS ===
-  const categoryContainerStyle = {
-    display: "flex",
-    gap: "0.5rem",
-    overflowX: "auto",
-    padding: "0.5rem 5%",
-    marginBottom: "1.5rem",
-    scrollbarWidth: "none",
-    msOverflowStyle: "none"
-  };
-
-  const categoryButtonStyle = (cat) => ({
-    padding: "0.4rem 0.8rem",
-    borderRadius: "20px",
-    border: "1px solid rgba(255,255,255,0.3)",
-    background: selectedCategory === cat ? "var(--primary)" : "var(--glass)",
-    backdropFilter: "blur(4px)",
-    color: selectedCategory === cat ? "white" : "var(--text)",
-    fontSize: "var(--font-xs)",
-    fontWeight: "600",
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-    transition: "all 0.2s"
-  });
-
   // === RENDER ===
   return (
     <section className="home">
       <h2 style={{ textAlign: "center", margin: "1.5rem 0 1rem", fontSize: "1.2rem", fontWeight: "800", color: "var(--primary)" }}>
-        Our Collections
+        Featured Collections
       </h2>
 
-      {/* CATEGORY BAR */}
-      <div style={categoryContainerStyle} className="category-bar">
+      {/* CATEGORY BAR (Home view) */}
+      <div className="category-bar">
         {categories.map(cat => (
           <button
             key={cat}
-            style={categoryButtonStyle(cat)}
+            className={`cat-btn ${selectedCategory === cat ? 'active' : ''}`}
             onClick={() => setSelectedCategory(cat)}
+            style={{
+              padding: "0.4rem 0.8rem",
+              borderRadius: "20px",
+              border: "1px solid rgba(255,255,255,0.3)",
+              background: selectedCategory === cat ? "var(--primary)" : "var(--glass)",
+              color: selectedCategory === cat ? "white" : "var(--text)",
+              fontSize: "var(--font-xs)",
+              fontWeight: "600",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              transition: "all 0.2s",
+              marginRight: "0.5rem"
+            }}
           >
             {cat.charAt(0).toUpperCase() + cat.slice(1)}
           </button>
         ))}
       </div>
 
-      {/* LOADING STATES */}
       {initialLoad && (
         <div className="loader">
-          <div className="spinner"></div> Fast loading products...
+          <div className="spinner"></div> Fast loading...
         </div>
       )}
 
-      {/* PRODUCT GRID */}
       <div className="product-grid">
         {products.map((item, index) => (
           <ProductCard
@@ -153,7 +135,7 @@ export default function Home({ addToCart }) {
 
       {products.length === 0 && !initialLoad && (
         <div style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>
-          No products found matching your criteria.
+          No products found.
         </div>
       )}
     </section>

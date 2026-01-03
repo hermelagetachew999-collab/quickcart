@@ -26,7 +26,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 5%;
+  padding: 0.35rem 5%;
   background: var(--glass);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -39,6 +39,8 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
   flex-wrap: nowrap;
   gap: 0.25rem;
+  height: 55px;
+  /* Minimized height */
 }
 
 /* Spacer for fixed navbar */
@@ -411,9 +413,9 @@ body {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   z-index: 2000;
 }
 
@@ -1501,15 +1503,78 @@ body {
     margin-bottom: 0;
   }
 
+  .nav-links {
+    position: fixed;
+    top: 55px;
+    right: -100%;
+    width: 260px;
+    height: calc(100vh - 55px);
+    background: rgba(15, 23, 42, 0.95);
+    /* Sleek dark background */
+    backdrop-filter: blur(20px);
+    flex-direction: column !important;
+    padding: 2rem 1.5rem;
+    gap: 1.5rem;
+    transition: 0.3s ease-in-out;
+    align-items: flex-start;
+    overflow-y: auto;
+  }
+
+  .nav-links.mobile-active {
+    right: 0;
+  }
+
+  .nav-links li {
+    width: 100%;
+  }
+
   .nav-links a {
+    color: white !important;
+    /* White font as requested */
+    font-size: 1.1rem;
     display: block;
-    padding: 1rem;
-    border-radius: 8px;
-    transition: background 0.3s ease;
+    width: 100%;
+    padding: 0.5rem 0;
   }
 
   .nav-links a:hover {
     background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Mobile Categories in Burger Menu */
+  .mobile-categories-section {
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .mobile-section-title {
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 0.8rem;
+  }
+
+  .mobile-category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    padding-left: 0.5rem;
+  }
+
+  .mobile-category-link {
+    color: #cbd5e1 !important;
+    font-size: 1rem !important;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .mobile-category-link:hover {
+    color: white !important;
   }
 
   .auth-item {
