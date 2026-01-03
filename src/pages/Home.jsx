@@ -96,19 +96,6 @@ export default function Home({ addToCart, categoriesProp }) {
             key={cat}
             className={`cat-btn ${selectedCategory === cat ? 'active' : ''}`}
             onClick={() => setSelectedCategory(cat)}
-            style={{
-              padding: "0.4rem 0.8rem",
-              borderRadius: "20px",
-              border: "1px solid rgba(255,255,255,0.3)",
-              background: selectedCategory === cat ? "var(--primary)" : "var(--glass)",
-              color: selectedCategory === cat ? "white" : "var(--text)",
-              fontSize: "var(--font-xs)",
-              fontWeight: "600",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-              transition: "all 0.2s",
-              marginRight: "0.5rem"
-            }}
           >
             {cat.charAt(0).toUpperCase() + cat.slice(1)}
           </button>

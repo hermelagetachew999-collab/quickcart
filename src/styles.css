@@ -143,6 +143,33 @@ body {
   display: none;
 }
 
+.cat-btn {
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: var(--glass);
+  color: var(--text);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 0.5rem;
+  backdrop-filter: blur(4px);
+}
+
+.cat-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+.cat-btn.active {
+  background: var(--primary) !important;
+  color: white !important;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -185,6 +212,8 @@ body {
   color: var(--text);
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
+  /* Standard property */
   -webkit-box-orient: vertical;
   overflow: hidden;
   height: 2.8em;
@@ -558,6 +587,8 @@ body {
 @media (max-width: 768px) {
   .hamburger-menu {
     display: flex;
+    order: 3;
+    /* Move after search */
   }
 
   .nav-links {
@@ -593,39 +624,17 @@ body {
   }
 
   .navbar-search {
-    max-width: 200px;
+    max-width: 250px;
+    /* Slightly wider on mobile */
     margin: 0 0.5rem;
+    order: 2;
+    /* Move before burger */
   }
 
-  /* Mobile Collections in Burger Menu */
-  .mobile-categories-section {
-    width: 100%;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 1rem;
-    margin-top: 1rem;
+  .logo {
+    order: 1;
   }
 
-  .mobile-section-title {
-    color: var(--primary);
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 0.8rem;
-  }
-
-  .mobile-category-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    padding-left: 0.5rem;
-  }
-
-  .mobile-category-link {
-    color: #cbd5e1 !important;
-    font-size: 0.95rem !important;
-    text-decoration: none;
-  }
 
   .product-grid {
     grid-template-columns: repeat(2, 1fr);

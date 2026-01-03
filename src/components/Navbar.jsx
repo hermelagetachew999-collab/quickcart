@@ -65,25 +65,6 @@ export default function Navbar({ user, setUser, cartCount, categories }) {
         <li><Link to="/cart" onClick={closeMobileMenu}>Cart ({cartCount})</Link></li>
         <li><Link to="/contact" onClick={closeMobileMenu}>Contact</Link></li>
 
-        {/* MOBILE CATEGORIES SECTION */}
-        {mobileMenuOpen && categories && (
-          <li className="mobile-categories-section">
-            <span className="mobile-section-title">Collections</span>
-            <div className="mobile-category-list">
-              {categories.slice(0, 14).map(cat => (
-                <Link
-                  key={cat}
-                  to={`/?category=${encodeURIComponent(cat)}`}
-                  onClick={closeMobileMenu}
-                  className="mobile-category-link"
-                >
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                </Link>
-              ))}
-            </div>
-          </li>
-        )}
-
         <li className="auth-item">
           {user ? (
             <div className="profile-container">
