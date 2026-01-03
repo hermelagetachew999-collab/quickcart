@@ -111,9 +111,10 @@ body {
 
 .auth-btn {
   background: transparent !important;
-  color: var(--text) !important;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 0.5rem 1rem;
+  color: white !important;
+  /* Changed to white as requested */
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 0.5rem 1.2rem;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
@@ -593,18 +594,25 @@ body {
 
   .nav-links {
     position: fixed;
-    top: 0;
+    top: var(--nav-height);
+    /* Start exactly below navbar */
     right: -100%;
-    width: 280px;
-    height: 100vh;
+    width: 200px;
+    /* Minimized width */
+    height: auto;
+    /* Height to fit content */
+    max-height: calc(100vh - var(--nav-height));
     background: var(--glass-dark);
     backdrop-filter: blur(20px);
     flex-direction: column;
-    padding: 5rem 2rem 2rem;
+    padding: 1.5rem;
+    /* Reduced padding */
     gap: 1.2rem;
     transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     align-items: flex-start;
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
+    box-shadow: -5px 5px 20px rgba(0, 0, 0, 0.3);
+    border-bottom-left-radius: 16px;
+    /* Rounded corner */
   }
 
   .nav-links.mobile-active {
