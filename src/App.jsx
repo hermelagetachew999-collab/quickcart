@@ -13,26 +13,13 @@ import Terms from "./pages/Terms";
 export default function App() {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
-  const [categories, setCategories] = useState(["All"]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
+      // Optional: validate token
       setUser({ email: "user@example.com" });
     }
-
-    // Fetch Categories
-    const cachedCats = localStorage.getItem("quickcart_categories");
-    if (cachedCats) setCategories(JSON.parse(cachedCats));
-
-    fetch("https://dummyjson.com/products/category-list")
-      .then(res => res.json())
-      .then(data => {
-        const fullCats = ["All", ...data];
-        setCategories(fullCats);
-        localStorage.setItem("quickcart_categories", JSON.stringify(fullCats));
-      })
-      .catch(err => console.error("Error fetching categories:", err));
   }, []);
 
   const addToCart = (item) => setCart(prev => [...prev, item]);
@@ -44,9 +31,9 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Navbar user={user} setUser={setUser} cartCount={cart.length} categories={categories} />
+      <Navbar user={user} setUser={setUser} cartCount={cart.length} />
       <Routes>
-        <Route path="/" element={<Home addToCart={addToCart} categoriesProp={categories} />} />
+        <Route path="/" element={<Home addToCart={addToCart} />} />
         <Route path="/cart" element={<Cart cartItems={cart} user={user} removeFromCart={removeFromCart} />} />
         <Route path="/contact" element={<Contact user={user} />} />
         <Route path="/about" element={<About />} />

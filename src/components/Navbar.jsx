@@ -3,24 +3,24 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthModal from "./AuthModal";
 
-export default function Navbar({ user, setUser, cartCount, categories }) {
+export default function Navbar({ user, setUser, cartCount }) {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showLogout, setShowLogout] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // NEW: MOBILE MENU STATE
   const navigate = useNavigate();
 
+  // === GLOBAL SEARCH: FILTERS HOME PAGE ===
   const handleSearch = (e) => {
     e.preventDefault();
     const term = searchTerm.trim();
-    navigate(term ? `/?search=${encodeURIComponent(term)}` : "/");
-    setMobileMenuOpen(false);
-  };
-
-  const handleCategoryClick = (cat) => {
-    navigate(`/?category=${encodeURIComponent(cat)}`);
-    setMobileMenuOpen(false);
+    if (term) {
+      navigate(`/?search=${encodeURIComponent(term)}`);
+    } else {
+      navigate("/");
+    }
+    setMobileMenuOpen(false); // Close mobile menu after search
   };
 
   const handleLogout = () => {
@@ -30,66 +30,64 @@ export default function Navbar({ user, setUser, cartCount, categories }) {
     setMobileMenuOpen(false);
   };
 
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
   return (
     <nav className="navbar">
       <h2 className="logo">
-        <Link to="/" onClick={() => setMobileMenuOpen(false)}>QuickCart</Link>
+        <Link to="/" onClick={closeMobileMenu}>QuickCart</Link>
       </h2>
 
-      <form onSubmit={handleSearch} className="navbar-search">
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="navbar-search-input"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        {/* Search button removed as requested */}
-      </form>
-
+      {/* HAMBURGER MENU BUTTON */}
       <button
         className="hamburger-menu"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label="Toggle menu"
       >
-        <span></span>
-        <span></span>
-        <span></span>
+        <span className={mobileMenuOpen ? "active" : ""}></span>
+        <span className={mobileMenuOpen ? "active" : ""}></span>
+        <span className={mobileMenuOpen ? "active" : ""}></span>
       </button>
 
+      {/* SEARCH BAR — FILTERS HOME PAGE */}
+      <form onSubmit={handleSearch} className="navbar-search">
+        <input
+          type="text"
+          placeholder="Search 200+ products..."
+          className="navbar-search-input"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <button type="submit" className="search-btn">
+          Search
+        </button>
+      </form>
+
+      {/* NAVIGATION LINKS */}
       <ul className={`nav-links ${mobileMenuOpen ? "mobile-active" : ""}`}>
-        <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
-        <li><Link to="/cart" onClick={() => setMobileMenuOpen(false)}>Cart ({cartCount})</Link></li>
+        <li><Link to="/" onClick={closeMobileMenu}>Home</Link></li>
+        <li><Link to="/cart" onClick={closeMobileMenu}>Cart ({cartCount})</Link></li>
 
-        {/* MOBILE ONLY CATEGORIES */}
-        {mobileMenuOpen && categories && (
-          <li className="mobile-categories">
-            <p style={{ color: "var(--primary)", fontSize: "0.8rem", margin: "1rem 0 0.5rem", fontWeight: "bold" }}>Categories</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", paddingLeft: "0.5rem" }}>
-              {categories.slice(0, 8).map(cat => (
-                <span
-                  key={cat}
-                  onClick={() => handleCategoryClick(cat)}
-                  style={{ cursor: "pointer", fontSize: "0.9rem", color: "#ccc" }}
-                >
-                  {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                </span>
-              ))}
-            </div>
-          </li>
-        )}
-
-        <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link></li>
-
+        {/* AUTH / PROFILE */}
         <li className="auth-item">
           {user ? (
             <div className="profile-container">
-              <div className="profile-avatar" onClick={() => setShowLogout(!showLogout)}>
+              {/* PROFILE AVATAR (FIRST LETTER) */}
+              <div
+                className="profile-avatar"
+                onClick={() => setShowLogout(!showLogout)}
+              >
                 {user.email.charAt(0).toUpperCase()}
               </div>
+
+              {/* LOGOUT DROPDOWN */}
               {showLogout && (
                 <div className="logout-dropdown">
-                  <button onClick={handleLogout} className="logout-btn">Logout</button>
+                  <button onClick={handleLogout} className="logout-btn">
+                    Logout
+                  </button>
                 </div>
               )}
             </div>
@@ -99,15 +97,17 @@ export default function Navbar({ user, setUser, cartCount, categories }) {
               onClick={() => {
                 setIsLogin(true);
                 setShowAuthModal(true);
-                setMobileMenuOpen(false);
+                closeMobileMenu();
               }}
             >
               Login / Signup
             </button>
           )}
         </li>
+        <li><Link to="/contact" onClick={closeMobileMenu}>Contact</Link></li>
       </ul>
 
+      {/* AUTH MODAL */}
       {showAuthModal && !user && (
         <AuthModal
           isLogin={isLogin}
