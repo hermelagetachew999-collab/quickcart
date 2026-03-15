@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ForgotPasswordModal from "./ForgotPasswordModal";
-const API_URL = "https://quickcart-bips.onrender.com";
+const API_URL = "http://localhost:5000";
 
 export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [email, setEmail] = useState("");

@@ -1,4 +1,4 @@
-const API_URL = "https://quickcart-bips.onrender.com";
+const API_URL = "http://localhost:5000";
 
 const getToken = () => localStorage.getItem("token");
 

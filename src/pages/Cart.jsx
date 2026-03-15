@@ -78,14 +78,16 @@ export default function Cart({ cartItems, user, removeFromCart }) {
       {/* MODAL */}
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal">
-            <h3>Confirm Order</h3>
-            <p><strong>Total: ${total}</strong></p>
-            <div className="modal-actions">
-              <button onClick={confirmCheckout} disabled={loading}>
+          <div className="modal-content">
+            <h2>Confirm Order</h2>
+            <p style={{ textAlign: 'center', fontSize: '1.2rem', marginBottom: '1.5rem' }}>
+              <strong>Total: ${total}</strong>
+            </p>
+            <div className="modal-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+              <button className="btn-primary" onClick={confirmCheckout} disabled={loading}>
                 {loading ? "Placing..." : "Confirm"}
               </button>
-              <button className="cancel" onClick={() => setShowModal(false)}>
+              <button className="btn-danger" onClick={() => setShowModal(false)}>
                 Cancel
               </button>
             </div>
