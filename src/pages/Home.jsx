@@ -50,7 +50,11 @@ export default function Home({ addToCart, categoriesProp }) {
           name: p.title,
           price: p.price,
           image: p.thumbnail || p.images?.[0] || "/fallback.jpg",
-          category: p.category
+          category: p.category,
+          description: p.description,
+          rating: p.rating,
+          reviews: p.reviews ? p.reviews.length : (Math.floor(Math.random() * 150) + 12),
+          stock: p.stock > 0 ? p.stock : 0
         }));
 
         localStorage.setItem("quickcart_all_products", JSON.stringify(apiProducts));
@@ -115,6 +119,10 @@ export default function Home({ addToCart, categoriesProp }) {
             name={item.name}
             price={item.price}
             image={item.image}
+            description={item.description}
+            rating={item.rating}
+            reviews={item.reviews}
+            stock={item.stock}
             onAddToCart={() => addToCart(item)}
           />
         ))}
