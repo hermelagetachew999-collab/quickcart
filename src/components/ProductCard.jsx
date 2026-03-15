@@ -95,14 +95,14 @@ export default function ProductCard({
         )}
 
         {/* Meta Info: Shipping, Warranty, Quality */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: 'auto', marginBottom: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+        <div className="meta-info" style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: 'auto', marginBottom: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
            {shippingInformation && <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><FiTruck size={12} /> {shippingInformation}</div>}
            {warrantyInformation && <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><FiShield size={12} /> {warrantyInformation}</div>}
         </div>
 
         {/* Tags */}
         {tags && tags.length > 0 && (
-          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '1rem' }}>
+          <div className="product-tags" style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginBottom: '1rem' }}>
             {tags.slice(0, 3).map((tag, i) => (
               <span key={i} style={{ background: 'var(--bg-default)', padding: '2px 8px', borderRadius: '12px', fontSize: '0.65rem', color: 'var(--text-muted)', border: '1px solid var(--glass-border)' }}>
                 #{tag}
@@ -113,7 +113,7 @@ export default function ProductCard({
 
         {/* Specifications Section */}
         {(weight || dimensions) && (
-          <div style={{ padding: '0.8rem', background: 'var(--bg-default)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', marginTop: 'auto', marginBottom: '1rem' }}>
+          <div className="specifications-section" style={{ padding: '0.8rem', background: 'var(--bg-default)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', marginTop: 'auto', marginBottom: '1rem' }}>
             <h4 style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>Specifications</h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', fontSize: '0.75rem' }}>
               {weight && (
