@@ -54,7 +54,13 @@ export default function Home({ addToCart, categoriesProp }) {
           description: p.description,
           rating: p.rating,
           reviews: p.reviews ? p.reviews.length : (Math.floor(Math.random() * 150) + 12),
-          stock: p.stock > 0 ? p.stock : 0
+          stock: p.stock > 0 ? p.stock : 0,
+          brand: p.brand,
+          discountPercentage: p.discountPercentage,
+          tags: p.tags,
+          shippingInformation: p.shippingInformation,
+          warrantyInformation: p.warrantyInformation,
+          availabilityStatus: p.availabilityStatus
         }));
 
         localStorage.setItem("quickcart_all_products", JSON.stringify(apiProducts));
@@ -123,6 +129,12 @@ export default function Home({ addToCart, categoriesProp }) {
             rating={item.rating}
             reviews={item.reviews}
             stock={item.stock}
+            brand={item.brand}
+            discountPercentage={item.discountPercentage}
+            tags={item.tags}
+            shippingInformation={item.shippingInformation}
+            warrantyInformation={item.warrantyInformation}
+            availabilityStatus={item.availabilityStatus}
             onAddToCart={() => addToCart(item)}
           />
         ))}
