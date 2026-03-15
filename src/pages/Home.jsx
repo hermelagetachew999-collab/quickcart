@@ -31,16 +31,17 @@ export default function Home({ addToCart, categoriesProp }) {
     setSelectedCategory(cat);
   }, [location.search]);
 
-  // === 1. CACHE ALL 194+ PRODUCTS ===
+  // === 1. GET PRODUCTS ===
   useEffect(() => {
-    const cachedProducts = localStorage.getItem("quickcart_all_products");
-
-    if (cachedProducts) {
-      const parsed = JSON.parse(cachedProducts);
-      setAllProducts([...localProducts, ...parsed]);
-      setProducts([...localProducts, ...parsed]);
-      setInitialLoad(false);
-    }
+    // Note: Temporarily disabled localStorage caching to ensure rich data is fetched.
+    // const cachedProducts = localStorage.getItem("quickcart_all_products");
+    //
+    // if (cachedProducts) {
+    //   const parsed = JSON.parse(cachedProducts);
+    //   setAllProducts([...localProducts, ...parsed]);
+    //   setProducts([...localProducts, ...parsed]);
+    //   setInitialLoad(false);
+    // }
 
     const loadData = async () => {
       try {
