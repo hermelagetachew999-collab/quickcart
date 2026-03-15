@@ -81,7 +81,10 @@ app.post('/api/forgot-password', async (req, res) => {
 
     // Mock sending email
     console.log(`Password reset code for ${email}: ${code}`);
-    res.json({ message: 'Reset code sent (check console during dev)' });
+    res.json({ 
+      message: 'Reset code sent!', 
+      code: code // Included for convenience since real email isn't set up
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

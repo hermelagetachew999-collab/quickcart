@@ -26,7 +26,7 @@ export default function ForgotPasswordModal({ onClose }) {
       const data = await res.json();
 
       if (res.ok) {
-        setStatus("✅ Reset code sent!");
+        setStatus(`✅ Reset code sent! Your code is: ${data.code}`);
         setStep(2); // move to step 2 to enter code and new password
       } else {
         setStatus(data.error || "Something went wrong.");

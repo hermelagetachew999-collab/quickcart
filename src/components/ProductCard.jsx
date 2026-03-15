@@ -5,7 +5,7 @@ export default function ProductCard({
   name, price, image, description, rating, reviews, stock, 
   brand, discountPercentage, tags, shippingInformation, warrantyInformation, availabilityStatus, 
   weight, dimensions,
-  onAddToCart 
+  onAddToCart, onCardClick
 }) {
   // Render full and half stars based on rating out of 5
   const renderStars = (rating) => {
@@ -32,7 +32,7 @@ export default function ProductCard({
   const isOutOfStock = availabilityStatus === "Out of Stock" || stock === 0;
 
   return (
-    <div className="product-card" style={{ display: 'flex', flexDirection: 'column' }}>
+    <div className="product-card" style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer' }} onClick={onCardClick}>
       <div className="product-image-container" style={{ position: 'relative' }}>
         <img src={image} alt={name} />
         
@@ -135,7 +135,7 @@ export default function ProductCard({
         )}
       </div>
 
-      <button onClick={onAddToCart} disabled={isOutOfStock} style={{ opacity: isOutOfStock ? 0.5 : 1, marginTop: 'auto' }}>
+      <button onClick={(e) => { e.stopPropagation(); onAddToCart(); }} disabled={isOutOfStock} style={{ opacity: isOutOfStock ? 0.5 : 1, marginTop: 'auto' }}>
         {isOutOfStock ? "Out of Stock" : "Add to Cart"}
       </button>
     </div>

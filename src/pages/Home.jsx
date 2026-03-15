@@ -1,6 +1,6 @@
-// pages/Home.jsx
 import React, { useState, useEffect, useRef } from "react";
 import ProductCard from "../components/ProductCard";
+import ProductDetailsModal from "../components/ProductDetailsModal";
 import { useLocation } from "react-router-dom";
 
 const localProducts = [ /* your 19 products */];
@@ -13,6 +13,8 @@ export default function Home({ addToCart, categoriesProp }) {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const location = useLocation();
 
   // === SYNC CATEGORIES FROM PROP ===
@@ -141,6 +143,10 @@ export default function Home({ addToCart, categoriesProp }) {
             weight={item.weight}
             dimensions={item.dimensions}
             onAddToCart={() => addToCart(item)}
+            onCardClick={() => {
+              setSelectedProduct(item);
+              setIsDetailsOpen(true);
+            }}
           />
         ))}
       </div>
@@ -149,6 +155,14 @@ export default function Home({ addToCart, categoriesProp }) {
         <div style={{ textAlign: "center", padding: "3rem", color: "var(--text-muted)" }}>
           No products found.
         </div>
+      )}
+
+      {isDetailsOpen && selectedProduct && (
+        <ProductDetailsModal 
+          product={selectedProduct} 
+          onClose={() => setIsDetailsOpen(false)} 
+          onAddToCart={addToCart}
+        />
       )}
     </section>
   );
