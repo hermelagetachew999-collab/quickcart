@@ -61,7 +61,9 @@ export default function Home({ addToCart, categoriesProp }) {
           tags: p.tags,
           shippingInformation: p.shippingInformation,
           warrantyInformation: p.warrantyInformation,
-          availabilityStatus: p.availabilityStatus
+          availabilityStatus: p.availabilityStatus,
+          weight: p.weight,
+          dimensions: p.dimensions
         }));
 
         localStorage.setItem("quickcart_all_products", JSON.stringify(apiProducts));
@@ -136,6 +138,8 @@ export default function Home({ addToCart, categoriesProp }) {
             shippingInformation={item.shippingInformation}
             warrantyInformation={item.warrantyInformation}
             availabilityStatus={item.availabilityStatus}
+            weight={item.weight}
+            dimensions={item.dimensions}
             onAddToCart={() => addToCart(item)}
           />
         ))}

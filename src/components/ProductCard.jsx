@@ -4,6 +4,7 @@ import { FiBox, FiTruck, FiShield } from "react-icons/fi";
 export default function ProductCard({ 
   name, price, image, description, rating, reviews, stock, 
   brand, discountPercentage, tags, shippingInformation, warrantyInformation, availabilityStatus, 
+  weight, dimensions,
   onAddToCart 
 }) {
   // Render full and half stars based on rating out of 5
@@ -107,6 +108,29 @@ export default function ProductCard({
                 #{tag}
               </span>
             ))}
+          </div>
+        )}
+
+        {/* Specifications Section */}
+        {(weight || dimensions) && (
+          <div style={{ padding: '0.8rem', background: 'var(--bg-default)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--glass-border)', marginTop: 'auto', marginBottom: '1rem' }}>
+            <h4 style={{ fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>Specifications</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', fontSize: '0.75rem' }}>
+              {weight && (
+                <div>
+                  <span style={{ color: 'var(--text-muted)' }}>Weight:</span>
+                  <span style={{ color: 'var(--text-main)', fontWeight: 'bold', marginLeft: '4px' }}>{weight}g</span>
+                </div>
+              )}
+              {dimensions && (
+                <div>
+                  <span style={{ color: 'var(--text-muted)' }}>Dim:</span>
+                  <span style={{ color: 'var(--text-main)', fontWeight: 'bold', marginLeft: '4px' }}>
+                    {dimensions.width}x{dimensions.height}x{dimensions.depth}cm
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
