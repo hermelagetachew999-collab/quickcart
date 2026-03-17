@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 import ProductDetailsModal from "../components/ProductDetailsModal";
 import { useLocation } from "react-router-dom";
@@ -11,7 +11,6 @@ export default function Home({ addToCart, categoriesProp }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState(["All"]);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);

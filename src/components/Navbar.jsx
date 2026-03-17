@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthModal from "./AuthModal";
 
-export default function Navbar({ user, setUser, cartCount, categories }) {
+export default function Navbar({ user, setUser, cartCount }) {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,7 +40,7 @@ export default function Navbar({ user, setUser, cartCount, categories }) {
       </h2>
 
       <button
-        className="hamburger-menu"
+        className={`hamburger-menu ${mobileMenuOpen ? "active" : ""}`}
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label="Toggle menu"
       >

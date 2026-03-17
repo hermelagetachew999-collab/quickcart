@@ -32,7 +32,7 @@ export default function ProductCard({
   const isOutOfStock = availabilityStatus === "Out of Stock" || stock === 0;
 
   return (
-    <div className="product-card" style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer' }} onClick={onCardClick}>
+    <div className="product-card" onClick={onCardClick}>
       <div className="product-image-container" style={{ position: 'relative' }}>
         <img src={image} alt={name} />
         
