@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const getToken = () => localStorage.getItem("token");
 
@@ -15,6 +15,27 @@ export const login = (data) =>
     method: "POST",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" },
+  }).then((r) => r.json());
+
+export const forgotPassword = (email) =>
+  fetch(`${API_URL}/api/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  }).then((r) => r.json());
+
+export const verifyCode = (email, code) =>
+  fetch(`${API_URL}/api/verify-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, code }),
+  }).then((r) => r.json());
+
+export const resetPassword = (data) =>
+  fetch(`${API_URL}/api/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   }).then((r) => r.json());
 
 // === PRODUCTS ===

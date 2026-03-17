@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ForgotPasswordModal from "./ForgotPasswordModal";
-const API_URL = "http://localhost:5000";
+import { login, signup } from "../api";
 
 export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
   const [email, setEmail] = useState("");
@@ -16,18 +16,13 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
     setLoading(true);
 
     try {
-      const endpoint = isLogin ? "/api/login" : "/api/register";
-      const body = isLogin ? { email, password } : { name, email, password };
+      const data = isLogin 
+        ? await login({ email, password }) 
+        : await signup({ name, email, password });
 
-      const res = await fetch(`${API_URL}${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
+      if (data.error) {
+        setError(data.error);
+      } else {
         if (isLogin) {
           localStorage.setItem("token", data.token);
           setUser(data.user);
@@ -38,11 +33,9 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
           setName("");
           setPassword("");
         }
-      } else {
-        setError(data.error || "Something went wrong");
       }
     } catch {
-      setError("Network error. Try again.");
+      setError("Network error. Check your connection or API URL.");
     } finally {
       setLoading(false);
     }

@@ -1,69 +1,54 @@
 import React, { useState } from "react";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import { forgotPassword, resetPassword } from "../api";
 
 export default function ForgotPasswordModal({ onClose }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1); // 1 = request code, 2 = reset password
+  const [step, setStep] = useState(1); 
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
-  // Step 1: Request reset code
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("");
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const data = await forgotPassword(email);
 
-      const data = await res.json();
-
-      if (res.ok) {
-        setStatus(`✅ Reset code sent! Your code is: ${data.code}`);
-        setStep(2); // move to step 2 to enter code and new password
+      if (data.error) {
+        setStatus(data.error);
       } else {
-        setStatus(data.error || "Something went wrong.");
+        setStatus(`✅ Reset code sent! Your code is: ${data.code}`);
+        setStep(2); 
       }
     } catch {
-      setStatus("⚠️ Network error. Try again.");
+      setStatus("⚠️ Network error. Check your connection.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Step 2: Reset password using verification code
   const handleReset = async (e) => {
     e.preventDefault();
     setStatus("");
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_URL}/api/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code, newPassword }),
-      });
+      const data = await resetPassword({ email, code, newPassword });
 
-      const data = await res.json();
-
-      if (res.ok) {
+      if (data.error) {
+        setStatus(data.error);
+      } else {
         setStatus("✅ Password reset successful!");
-        setStep(1); // go back to initial step or close modal
+        setStep(1); 
         setEmail("");
         setCode("");
         setNewPassword("");
-      } else {
-        setStatus(data.error || "Failed to reset password.");
       }
     } catch {
-      setStatus("⚠️ Network error. Try again.");
+      setStatus("⚠️ Network error. Check your connection.");
     } finally {
       setLoading(false);
     }
