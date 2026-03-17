@@ -3,7 +3,6 @@ import ForgotPasswordModal from "./ForgotPasswordModal";
 import { login, signup } from "../api";
 
 export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
-  console.log("AuthModal rendering. User is trying to", isLogin ? "Login" : "Signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -36,7 +35,6 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
         }
       }
     } catch (err) {
-      console.error("Auth Submission Error:", err);
       setError("Network error. Check your connection or API URL.");
     } finally {
       setLoading(false);

@@ -23,8 +23,7 @@ export default function ForgotPasswordModal({ onClose }) {
         setStatus(`✅ Reset code sent! Your code is: ${data.code}`);
         setStep(2); 
       }
-    } catch (err) {
-      console.error("ForgotPassword Request Error:", err);
+    } catch {
       setStatus("⚠️ Network error. Check your connection.");
     } finally {
       setLoading(false);
@@ -48,8 +47,7 @@ export default function ForgotPasswordModal({ onClose }) {
         setCode("");
         setNewPassword("");
       }
-    } catch (err) {
-      console.error("Password Reset Error:", err);
+    } catch {
       setStatus("⚠️ Network error. Check your connection.");
     } finally {
       setLoading(false);
