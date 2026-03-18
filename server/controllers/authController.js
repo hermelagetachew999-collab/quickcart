@@ -23,8 +23,8 @@ export const register = async (req, res) => {
 
     res.status(201).json({ message: 'User created successfully', user: newUser.rows[0] });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('ERROR during register:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
 
@@ -44,8 +44,8 @@ export const login = async (req, res) => {
     const token = jwt.sign({ id: user.rows[0].id, email: user.rows[0].email }, JWT_SECRET, { expiresIn: '7d' });
     return res.json({ token, user: { name: user.rows[0].name, email: user.rows[0].email } });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('ERROR during login:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
 
@@ -71,8 +71,8 @@ export const forgotPassword = async (req, res) => {
       message: 'Reset code sent!' 
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('ERROR during forgotPassword:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
 
@@ -93,8 +93,8 @@ export const verifyCode = async (req, res) => {
 
     res.json({ success: true, message: 'Code verified. You can now reset your password.' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('ERROR during verifyCode:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
 
@@ -119,7 +119,7 @@ export const resetPassword = async (req, res) => {
 
     res.json({ message: 'Password reset successfully' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('ERROR during resetPassword:', err);
+    res.status(500).json({ error: 'Server error', details: err.message });
   }
 };
