@@ -68,8 +68,7 @@ export const forgotPassword = async (req, res) => {
     // Mock sending email
     console.log(`Password reset code for ${email}: ${code}`);
     res.json({ 
-      message: 'Reset code sent!', 
-      code: code 
+      message: 'Reset code sent!' 
     });
   } catch (err) {
     console.error(err);

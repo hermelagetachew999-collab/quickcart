@@ -95,7 +95,7 @@ export default function Contact({ user }) {
           </button>
         </form>
 
-        {status && (
+        {status && status !== "Sending..." && (
           <p className={`status ${status.includes("sent") ? "success" : "error"}`}>
             {status}
           </p>

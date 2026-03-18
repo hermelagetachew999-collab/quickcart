@@ -20,7 +20,7 @@ export default function ForgotPasswordModal({ onClose }) {
       if (data.error) {
         setStatus(data.error);
       } else {
-        setStatus(`✅ Reset code sent! Your code is: ${data.code}`);
+        setStatus(`✅ Reset code sent! Check your email.`);
         setStep(2); 
       }
     } catch {

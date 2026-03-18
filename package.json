@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "node server/server.js"
+    "server": "node server/server.js",
+    "dev:all": "start npm run server && npm run dev"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

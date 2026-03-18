@@ -22,6 +22,13 @@ app.get('/api/products', (req, res) => {
   res.json([]);
 });
 
+// === CONTACT ===
+app.post('/api/contact', (req, res) => {
+  const { name, email, message } = req.body;
+  console.log(`Contact message from ${name} (${email}): ${message}`);
+  res.json({ success: true, message: 'Message received!' });
+});
+
 // === ORDERS ===
 // Simple middleware to extract user from token
 const authMiddleware = (req, res, next) => {
@@ -52,8 +59,6 @@ app.post('/api/orders', authMiddleware, async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-}
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 export default app;
