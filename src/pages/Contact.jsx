@@ -19,7 +19,7 @@ export default function Contact({ user }) {
       setStatus("Message sent! We'll reply soon.");
       setForm({ name: "", email: "", message: "" });
     } else {
-      setStatus(res.error || "Failed. Try again.");
+      setStatus(res.details ? `${res.error || "Failed"}: ${res.details}` : (res.error || "Failed. Try again."));
     }
   };
 

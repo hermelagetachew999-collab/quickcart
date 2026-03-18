@@ -18,7 +18,7 @@ export default function ForgotPasswordModal({ onClose }) {
       const data = await forgotPassword(email);
 
       if (data.error) {
-        setStatus(data.error);
+        setStatus(data.details ? `${data.error}: ${data.details}` : data.error);
       } else {
         setStatus(`✅ Reset code sent! Check your email.`);
         setStep(2); 

@@ -21,7 +21,7 @@ export default function AuthModal({ isLogin, setIsLogin, setUser, onClose }) {
         : await signup({ name, email, password });
 
       if (data.error) {
-        setError(data.error);
+        setError(data.details ? `${data.error}: ${data.details}` : data.error);
       } else {
         if (isLogin) {
           localStorage.setItem("token", data.token);
